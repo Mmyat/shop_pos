@@ -1,0 +1,32 @@
+# ========================
+# Backend (Go)
+# ========================
+backend/.env
+backend/shop_pos_backend
+backend/*.exe
+
+# Go build artifacts
+backend/vendor/
+
+# ========================
+# Frontend (Node / Vite)
+# ========================
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# Tauri build outputs
+frontend/src-tauri/target/
+frontend/src-tauri/gen/android/
+frontend/src-tauri/gen/ios/
+
+# ========================
+# OS / Editor
+# ========================
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/settings.json
+.idea/
