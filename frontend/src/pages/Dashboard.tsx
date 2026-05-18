@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import api from '../utils/api';
 import { TrendingUp, Package, Users, DollarSign, AlertTriangle, Clock } from 'lucide-react';
 
 interface Stats {
@@ -39,10 +39,7 @@ const Dashboard = () => {
 
   const fetchDashboard = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:8080/api/dashboard', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/dashboard');
       setStats(res.data.stats);
       setRecentSales(res.data.recent_sales ?? []);
       setLowStock(res.data.low_stock_products ?? []);

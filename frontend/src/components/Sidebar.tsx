@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, ShoppingCart, Package, Settings, Users, TrendingUp, X } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, Layers, Settings, Users, TrendingUp, X } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -17,6 +17,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { name: t('dashboard'), path: '/', icon: <LayoutDashboard size={20} /> },
     { name: t('pos'), path: '/pos', icon: <ShoppingCart size={20} /> },
     { name: t('products'), path: '/products', icon: <Package size={20} /> },
+    { name: 'Categories', path: '/categories', icon: <Layers size={20} /> },
     { name: 'Sales', path: '/sales', icon: <TrendingUp size={20} /> },
   ];
 

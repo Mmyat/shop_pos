@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import POS from './pages/POS';
 import Products from './pages/Products';
+import Categories from './pages/Categories';
 import Users from './pages/Users';
 import Sales from './pages/Sales';
 import Login from './pages/Login';
@@ -60,6 +61,12 @@ function App() {
         <Route path="/products" element={
           <ProtectedRoute>
             <Products />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/categories" element={
+          <ProtectedRoute>
+            <Categories />
           </ProtectedRoute>
         } />
 

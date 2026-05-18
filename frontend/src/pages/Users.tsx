@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import api from '../utils/api';
 import { UserPlus, UserCircle, Shield, Trash2, Edit2, Eye, EyeOff } from 'lucide-react';
 
 interface User {
@@ -23,10 +23,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:8080/api/users', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/users');
       setUsers(res.data);
     } catch (err) {
       console.error(err);
@@ -36,10 +33,7 @@ const Users = () => {
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('http://localhost:8080/api/register', formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post('/register', formData);
       setIsModalOpen(false);
       fetchUsers();
       setFormData({ username: '', password: '', role: 'cashier' });
@@ -52,10 +46,7 @@ const Users = () => {
   const handleDelete = async (id: number) => {
     if (!window.confirm('Delete this user?')) return;
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:8080/api/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/users/${id}`);
       fetchUsers();
     } catch (err) {
       console.error(err);

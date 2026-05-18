@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import api from '../utils/api';
 import { Printer, Eye, Calendar, DollarSign, ShoppingBag } from 'lucide-react';
 
 interface Sale {
@@ -9,6 +9,11 @@ interface Sale {
   created_at: string;
   user: { username: string };
   items: any[];
+  product?: {
+    name: string;
+  };
+  quantity?: number;
+  unit_price?: number;
 }
 
 const Sales = () => {
@@ -22,10 +27,7 @@ const Sales = () => {
 
   const fetchSales = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:8080/api/sales', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/sales');
       setSales(res.data);
     } catch (err) {
       console.error(err);
@@ -62,6 +64,8 @@ const Sales = () => {
                 <th className="py-3 px-4 font-semibold text-gray-600">ID</th>
                 <th className="py-3 px-4 font-semibold text-gray-600">{t('date')}</th>
                 <th className="py-3 px-4 font-semibold text-gray-600">Cashier</th>
+                <th className="py-3 px-4 font-semibold text-gray-600">Product Purchased</th>
+                <th className="py-3 px-4 font-semibold text-gray-600 text-center">Qty</th>
                 <th className="py-3 px-4 font-semibold text-gray-600">{t('total')}</th>
                 <th className="py-3 px-4 font-semibold text-gray-600 text-right">{t('actions')}</th>
               </tr>
@@ -72,6 +76,10 @@ const Sales = () => {
                   <td className="py-3 px-4 text-gray-500">#{sale.id}</td>
                   <td className="py-3 px-4 text-gray-600">{new Date(sale.created_at).toLocaleString()}</td>
                   <td className="py-3 px-4 font-medium text-gray-800">{sale.user?.username}</td>
+                  <td className="py-3 px-4 font-semibold text-gray-800">
+                    {sale.product?.name || <span className="text-gray-300 italic">Unknown</span>}
+                  </td>
+                  <td className="py-3 px-4 text-center font-mono font-medium text-gray-600">{sale.quantity}</td>
                   <td className="py-3 px-4 font-bold text-primary-600">${sale.total_amount.toFixed(2)}</td>
                   <td className="py-3 px-4 text-right flex justify-end space-x-2">
                     <button 

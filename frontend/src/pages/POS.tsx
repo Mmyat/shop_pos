@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import api from '../utils/api';
 import { Search, ShoppingCart, Trash2, Plus, Minus, Package, Printer } from 'lucide-react';
 
 interface Product {
@@ -37,10 +37,7 @@ const POS = () => {
 
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:8080/api/products', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get('/products');
       setProducts(res.data);
     } catch (err) {
       console.error(err);
@@ -108,7 +105,6 @@ const POS = () => {
   const checkout = async () => {
     if (cart.length === 0) return;
     try {
-      const token = localStorage.getItem('token');
       const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.cartQuantity), 0);
 
       const payload = {
@@ -120,9 +116,7 @@ const POS = () => {
         }))
       };
 
-      const res = await axios.post('http://localhost:8080/api/sales', payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.post('/sales', payload);
 
       // Backend now returns the full sale object with items
       if (res.data && res.data.id) {
