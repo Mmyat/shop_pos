@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
-import { TrendingUp, Package, Users, DollarSign, AlertTriangle, Clock } from 'lucide-react';
+import { TrendingUp, Package, DollarSign, AlertTriangle, Clock } from 'lucide-react';
 
 interface Stats {
   total_sales: number;

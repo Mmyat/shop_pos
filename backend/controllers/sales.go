@@ -31,21 +31,38 @@ func CreateSale(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
-	
+
 	uid := uint(userID.(float64))
+
+	sale := models.Sale{
+		TotalAmount: input.TotalAmount,
+		UserID:      uid,
+	}
 
 	// Start a transaction
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
-		sale := models.Sale{
-			TotalAmount: input.TotalAmount,
-			UserID:      uid,
-		}
-
+		// Create Sale header record
 		if err := tx.Create(&sale).Error; err != nil {
 			return err
 		}
 
 		for _, item := range input.Items {
+			// Update product stock
+			var product models.Product
+			if err := tx.First(&product, item.ProductID).Error; err != nil {
+				return err
+			}
+
+			product.StockQuantity -= item.Quantity
+			if product.StockQuantity < 0 {
+				product.StockQuantity = 0
+			}
+
+			if err := tx.Save(&product).Error; err != nil {
+				return err
+			}
+
+			// Create SaleItem details record
 			saleItem := models.SaleItem{
 				SaleID:    sale.ID,
 				ProductID: item.ProductID,
@@ -56,55 +73,42 @@ func CreateSale(c *gin.Context) {
 			if err := tx.Create(&saleItem).Error; err != nil {
 				return err
 			}
-
-			// Update product stock
-			var product models.Product
-			if err := tx.First(&product, item.ProductID).Error; err != nil {
-				return err
-			}
-
-			product.StockQuantity -= item.Quantity
-			if product.StockQuantity < 0 {
-				product.StockQuantity = 0 // prevent negative stock, though realistically you'd want an error
-			}
-
-			if err := tx.Save(&product).Error; err != nil {
-				return err
-			}
 		}
 		return nil
 	})
 
-	// Reload the sale with items and product details for the receipt
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create sale: " + err.Error()})
 		return
 	}
 
-	var createdSale models.Sale
-	config.DB.Preload("Items").Preload("Items.Product").Preload("User").
-		Order("id DESC").First(&createdSale)
+	// Reload the created sale with user, items, and products
+	var loadedSale models.Sale
+	if err := config.DB.Preload("User").Preload("Items").Preload("Items.Product").First(&loadedSale, sale.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reload created sale"})
+		return
+	}
 
-	c.JSON(http.StatusOK, createdSale)
+	c.JSON(http.StatusOK, loadedSale)
 }
 
 func GetSales(c *gin.Context) {
 	var sales []models.Sale
-	if result := config.DB.Preload("Items").Preload("Items.Product").Preload("User").Find(&sales); result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve sales"})
+	// Fetch physical sales records preloading user details and all item lines
+	result := config.DB.Preload("User").Preload("Items").Preload("Items.Product").Order("id DESC").Find(&sales)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve sales history"})
 		return
 	}
-
 	c.JSON(http.StatusOK, sales)
 }
 
 func GetSaleByID(c *gin.Context) {
 	id := c.Param("id")
 	var sale models.Sale
-	if result := config.DB.Preload("Items").Preload("Items.Product").Preload("User").First(&sale, id); result.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Sale not found"})
+	if result := config.DB.Preload("User").Preload("Items").Preload("Items.Product").First(&sale, id); result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Sale record not found"})
 		return
 	}
-
 	c.JSON(http.StatusOK, sale)
 }

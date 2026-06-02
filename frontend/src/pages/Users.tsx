@@ -62,7 +62,7 @@ const Users = () => {
           className="flex items-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
         >
           <UserPlus size={18} />
-          <span>Add User</span>
+          <span>{t('add_user')}</span>
         </button>
       </div>
 
@@ -94,7 +94,7 @@ const Users = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">Add New User</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">{t('add_new_user')}</h3>
             <form onSubmit={handleAddUser} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('username')}</label>
@@ -132,8 +132,8 @@ const Users = () => {
                   value={formData.role}
                   onChange={e => setFormData({...formData, role: e.target.value})}
                 >
-                  <option value="cashier">Cashier</option>
-                  <option value="admin">Admin</option>
+                  <option value="cashier">{t('cashier')}</option>
+                  <option value="admin">{t('admin')}</option>
                 </select>
               </div>
               <div className="flex justify-end space-x-3 mt-6">

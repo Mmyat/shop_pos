@@ -17,6 +17,9 @@ import (
 func main() {
 	godotenv.Load()
 
+	// Auto-generate asymmetric cryptographic keys for Admin and Cashier roles
+	config.GenerateRoleKeys()
+
 	// 1. Create the database if it doesn't exist
 	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
 	db, err := sql.Open("pgx", dsn)
@@ -35,6 +38,8 @@ func main() {
 	// 2. Connect to shop_pos and migrate
 	config.ConnectDB()
 	fmt.Println("Migrating database...")
+	// Force-drop old tables to refresh relationship constraints and types cleanly
+	config.DB.Migrator().DropTable("sales", "sale_items")
 	config.DB.AutoMigrate(&models.User{}, &models.Category{}, &models.Product{}, &models.Sale{}, &models.SaleItem{})
 
 	// 3. Seed Data

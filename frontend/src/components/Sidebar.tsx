@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LayoutDashboard, ShoppingCart, Package, Layers, Settings, Users, TrendingUp, X } from 'lucide-react';
@@ -17,12 +17,12 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { name: t('dashboard'), path: '/', icon: <LayoutDashboard size={20} /> },
     { name: t('pos'), path: '/pos', icon: <ShoppingCart size={20} /> },
     { name: t('products'), path: '/products', icon: <Package size={20} /> },
-    { name: 'Categories', path: '/categories', icon: <Layers size={20} /> },
-    { name: 'Sales', path: '/sales', icon: <TrendingUp size={20} /> },
+    { name: t('categories'), path: '/categories', icon: <Layers size={20} /> },
+    { name: t('sales'), path: '/sales', icon: <TrendingUp size={20} /> },
   ];
 
   if (user.role === 'admin') {
-    links.push({ name: 'Users', path: '/users', icon: <Users size={20} /> });
+    links.push({ name: t('users'), path: '/users', icon: <Users size={20} /> });
   }
 
   return (

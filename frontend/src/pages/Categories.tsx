@@ -123,9 +123,9 @@ const Categories = () => {
         <div>
           <h2 className="text-xl font-bold text-gray-800 flex items-center">
             <Layers size={22} className="mr-2 text-primary-500" />
-            Category Management
+            {t('category_management')}
           </h2>
-          <p className="text-xs text-gray-500 mt-1">Classify and organize your shop products catalog</p>
+          <p className="text-xs text-gray-500 mt-1">{t('category_management_desc')}</p>
         </div>
 
         <div>
@@ -135,12 +135,12 @@ const Categories = () => {
               className="flex items-center justify-center space-x-2 bg-primary-600 text-white px-4 py-2.5 rounded-xl hover:bg-primary-700 transition-colors shadow-sm font-medium text-sm w-full sm:w-auto"
             >
               <Plus size={18} />
-              <span>Add Category</span>
+              <span>{t('add_category')}</span>
             </button>
           ) : (
             <div className="flex items-center space-x-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-2 rounded-xl">
               <ShieldAlert size={14} className="text-amber-500" />
-              <span>View-only mode (Admin required)</span>
+              <span>{t('view_only_mode')}</span>
             </div>
           )}
         </div>
@@ -151,7 +151,7 @@ const Categories = () => {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
         <input
           type="text"
-          placeholder="Search categories by name or description..."
+          placeholder={t('search_categories')}
           className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-shadow text-sm"
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -170,8 +170,8 @@ const Categories = () => {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
                 <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm w-16">ID</th>
-                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm w-48">Category Name</th>
-                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">Description</th>
+                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm w-48">{t('category_name')}</th>
+                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">{t('description')}</th>
                 {isAdmin && <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm text-right w-32">{t('actions')}</th>}
               </tr>
             </thead>
@@ -181,7 +181,7 @@ const Categories = () => {
                   <td className="py-3.5 px-4 text-gray-500 text-sm font-mono">{category.id}</td>
                   <td className="py-3.5 px-4 font-semibold text-gray-800 text-sm">{category.name}</td>
                   <td className="py-3.5 px-4 text-gray-500 text-sm max-w-md truncate" title={category.description}>
-                    {category.description || <em className="text-gray-300">No description provided</em>}
+                    {category.description || <em className="text-gray-300">{t('no_description')}</em>}
                   </td>
                   {isAdmin && (
                     <td className="py-3.5 px-4">
@@ -189,14 +189,14 @@ const Categories = () => {
                         <button
                           onClick={() => openEditModal(category)}
                           className="p-1.5 text-gray-400 hover:text-primary-600 bg-gray-50 hover:bg-primary-50 rounded-lg transition-colors"
-                          title="Edit"
+                          title={t('edit')}
                         >
                           <Edit2 size={15} />
                         </button>
                         <button
                           onClick={() => handleDelete(category.id)}
                           className="p-1.5 text-gray-400 hover:text-red-600 bg-gray-50 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
+                          title={t('delete')}
                         >
                           <Trash2 size={15} />
                         </button>
@@ -208,7 +208,7 @@ const Categories = () => {
               {filteredCategories.length === 0 && (
                 <tr>
                   <td colSpan={isAdmin ? 4 : 3} className="py-12 text-center text-gray-400 text-sm">
-                    No categories found. Add a classification to get started!
+                    {t('no_categories_found')}
                   </td>
                 </tr>
               )}
@@ -222,12 +222,12 @@ const Categories = () => {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-5 sm:p-6 w-full max-w-md shadow-2xl">
             <h3 className="text-xl font-bold text-gray-800 mb-5">
-              {editingCategory ? 'Edit Category' : 'Add New Category'}
+              {editingCategory ? t('edit_category') : t('add_new_category')}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('category_name')}</label>
                 <input
                   type="text"
                   placeholder="e.g. Beverages"
@@ -240,7 +240,7 @@ const Categories = () => {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('description')}</label>
                 <textarea
                   placeholder="Describe the category items..."
                   className="input-field min-h-[100px] resize-y"
@@ -262,7 +262,7 @@ const Categories = () => {
                   type="submit"
                   className="px-5 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium text-sm"
                 >
-                  {editingCategory ? 'Update' : t('save')}
+                  {editingCategory ? t('update') : t('save')}
                 </button>
               </div>
             </form>

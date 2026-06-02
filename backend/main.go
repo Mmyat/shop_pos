@@ -19,6 +19,9 @@ func main() {
 		log.Println("Error loading .env file, relying on environment variables")
 	}
 
+	// Auto-generate asymmetric cryptographic keys for Admin and Cashier roles
+	config.GenerateRoleKeys()
+
 	// Connect to Database
 	config.ConnectDB()
 

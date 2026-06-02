@@ -40,16 +40,18 @@ type Sale struct {
 	TotalAmount float64    `gorm:"not null" json:"total_amount"`
 	UserID      uint       `json:"user_id"`
 	User        User       `gorm:"foreignKey:UserID" json:"user"`
-	Items       []SaleItem `gorm:"foreignKey:SaleID" json:"items"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
+	Items       []SaleItem `gorm:"foreignKey:SaleID;constraint:OnDelete:CASCADE" json:"items"`
 }
 
 type SaleItem struct {
-	ID        uint    `gorm:"primaryKey" json:"id"`
-	SaleID    uint    `gorm:"not null" json:"sale_id"`
-	ProductID uint    `gorm:"not null" json:"product_id"`
-	Product   Product `gorm:"foreignKey:ProductID" json:"product"`
-	Quantity  int     `gorm:"not null" json:"quantity"`
-	Price     float64 `gorm:"not null" json:"price"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	SaleID    uint      `gorm:"not null" json:"sale_id"`
+	ProductID uint      `gorm:"not null" json:"product_id"`
+	Product   Product   `gorm:"foreignKey:ProductID" json:"product"`
+	Quantity  int       `gorm:"not null" json:"quantity"`
+	Price     float64   `gorm:"not null" json:"price"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

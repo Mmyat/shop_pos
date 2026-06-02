@@ -1,19 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
-import { Printer, Eye, Calendar, DollarSign, ShoppingBag } from 'lucide-react';
+import { Printer, Eye, Calendar } from 'lucide-react';
+
+interface SaleItem {
+  id: number;
+  product_id: number;
+  product: {
+    name: string;
+  };
+  quantity: number;
+  price: number;
+}
 
 interface Sale {
   id: number;
   total_amount: number;
   created_at: string;
   user: { username: string };
-  items: any[];
-  product?: {
-    name: string;
-  };
-  quantity?: number;
-  unit_price?: number;
+  items: SaleItem[];
 }
 
 const Sales = () => {
@@ -63,9 +68,9 @@ const Sales = () => {
               <tr className="bg-gray-50 border-b border-gray-100">
                 <th className="py-3 px-4 font-semibold text-gray-600">ID</th>
                 <th className="py-3 px-4 font-semibold text-gray-600">{t('date')}</th>
-                <th className="py-3 px-4 font-semibold text-gray-600">Cashier</th>
-                <th className="py-3 px-4 font-semibold text-gray-600">Product Purchased</th>
-                <th className="py-3 px-4 font-semibold text-gray-600 text-center">Qty</th>
+                <th className="py-3 px-4 font-semibold text-gray-600">{t('cashier')}</th>
+                <th className="py-3 px-4 font-semibold text-gray-600">{t('product_purchased')}</th>
+                <th className="py-3 px-4 font-semibold text-gray-600 text-center">{t('qty')}</th>
                 <th className="py-3 px-4 font-semibold text-gray-600">{t('total')}</th>
                 <th className="py-3 px-4 font-semibold text-gray-600 text-right">{t('actions')}</th>
               </tr>
@@ -77,9 +82,17 @@ const Sales = () => {
                   <td className="py-3 px-4 text-gray-600">{new Date(sale.created_at).toLocaleString()}</td>
                   <td className="py-3 px-4 font-medium text-gray-800">{sale.user?.username}</td>
                   <td className="py-3 px-4 font-semibold text-gray-800">
-                    {sale.product?.name || <span className="text-gray-300 italic">Unknown</span>}
+                    {sale.items && sale.items.length > 0
+                      ? sale.items.map(item => `${item.product?.name} (x${item.quantity})`).join(', ')
+                      : <span className="text-gray-300 italic">No Items</span>
+                    }
                   </td>
-                  <td className="py-3 px-4 text-center font-mono font-medium text-gray-600">{sale.quantity}</td>
+                  <td className="py-3 px-4 text-center font-mono font-medium text-gray-600">
+                    {sale.items && sale.items.length > 0
+                      ? sale.items.reduce((sum, item) => sum + item.quantity, 0)
+                      : 0
+                    }
+                  </td>
                   <td className="py-3 px-4 font-bold text-primary-600">${sale.total_amount.toFixed(2)}</td>
                   <td className="py-3 px-4 text-right flex justify-end space-x-2">
                     <button 
@@ -113,11 +126,11 @@ const Sales = () => {
                 <p className="text-sm">Tel: 09-123456789</p>
                 <div className="border-t my-4"></div>
                 <div className="flex justify-between text-sm">
-                  <span>Receipt #: {selectedSale.id}</span>
+                  <span>{t('receipt_no')}: {selectedSale.id}</span>
                   <span>{new Date(selectedSale.created_at).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Cashier: {selectedSale.user?.username}</span>
+                  <span>{t('cashier')}: {selectedSale.user?.username}</span>
                   <span>{new Date(selectedSale.created_at).toLocaleTimeString()}</span>
                 </div>
                 <div className="border-t my-4"></div>
@@ -126,9 +139,9 @@ const Sales = () => {
               <table className="w-full text-sm mb-4">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-2">Item</th>
-                    <th className="text-center py-2">Qty</th>
-                    <th className="text-right py-2">Price</th>
+                    <th className="text-left py-2">{t('item')}</th>
+                    <th className="text-center py-2">{t('qty')}</th>
+                    <th className="text-right py-2">{t('price')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -144,14 +157,14 @@ const Sales = () => {
 
               <div className="border-t pt-4">
                 <div className="flex justify-between font-bold text-lg">
-                  <span>TOTAL</span>
+                  <span>{t('total')}</span>
                   <span>${selectedSale.total_amount.toFixed(2)}</span>
                 </div>
               </div>
               
               <div className="text-center mt-8 text-sm">
-                <p>Thank you for shopping with us!</p>
-                <p>Please come again.</p>
+                <p>{t('thank_you')}</p>
+                <p>{t('come_again')}</p>
               </div>
             </div>
 

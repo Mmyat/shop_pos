@@ -71,7 +71,7 @@ const POS = () => {
     }
   };
 
-  const handlePrint = (sale: Sale) => {
+  const handlePrint = (_sale: Sale) => {
     const printContent = document.getElementById('receipt-print');
     if (printContent) {
       const win = window.open('', '', 'height=600,width=400');
