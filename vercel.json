@@ -1,13 +1,16 @@
 {
-    "experimentalServices": {
-        "frontend": {
-            "root": "frontend",
-            "routePrefix": "/",
-            "framework": "vite"
-        },
-        "backend": {
-            "root": "backend",
-            "routePrefix": "/"
-        }
+  "version": 3,
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "vite",
+      "routePrefix": "/"
+    },
+    "backend": {
+      "root": "backend",
+      "framework": "go",
+      "entrypoint": "main.go",
+      "routePrefix": "/_/backend"
     }
+  }
 }
