@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import api from '../utils/api';
-import { Plus, Edit2, Trash2, Package, Search } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import api from "../utils/api";
+import { Plus, Edit2, Trash2, Package, Search } from "lucide-react";
 
 interface Product {
   id: number;
@@ -25,13 +25,13 @@ interface Category {
 }
 
 const emptyProductForm = {
-  name: '',
+  name: "",
   price: 0,
   stock_quantity: 0,
   low_stock_threshold: 5,
   category_id: 0,
-  image_url: '',
-  barcode: '',
+  image_url: "",
+  barcode: "",
 };
 
 const Products = () => {
@@ -43,44 +43,25 @@ const Products = () => {
   // Data states
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   // Modal and form states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState(emptyProductForm);
-
-  useEffect(() => {
-    // Extract logged in user credentials
-    const userString = localStorage.getItem('user');
-    if (userString) {
-      try {
-        const user = JSON.parse(userString);
-        setIsAdmin(user.role === 'admin');
-      } catch (err) {
-        console.error('Error parsing user data:', err);
-      }
-    }
-
-    fetchProducts();
-    fetchCategories();
-  }, []);
-
-  // Update default category ID for product form once categories are fetched
-  useEffect(() => {
-    if (categories.length > 0 && formData.category_id === 0) {
-      setFormData(prev => ({ ...prev, category_id: categories[0].id }));
-    }
-  }, [categories, formData.category_id]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/products');
-      setProducts(res.data);
+      const res = await api.get("/products");
+      const data = res.data as any;
+      const items = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
+      setProducts(items);
     } catch (err) {
-      console.error('Failed to fetch products:', err);
+      console.error("Failed to fetch products:", err);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -88,10 +69,15 @@ const Products = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await api.get('/categories');
-      setCategories(res.data);
+      const res = await api.get("/categories");
+      const data = res.data as Category[];
+      setCategories(data);
+      setFormData((prev) => ({
+        ...prev,
+        category_id: prev.category_id || data[0]?.id || 0,
+      }));
     } catch (err) {
-      console.error('Failed to fetch categories:', err);
+      console.error("Failed to fetch categories:", err);
     }
   };
 
@@ -120,6 +106,8 @@ const Products = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       const payload = {
         ...formData,
@@ -132,38 +120,57 @@ const Products = () => {
       if (editingProduct) {
         await api.put(`/products/${editingProduct.id}`, payload);
       } else {
-        await api.post('/products', payload);
+        await api.post("/products", payload);
       }
       setIsModalOpen(false);
       fetchProducts();
     } catch (err) {
       console.error(err);
-      alert('Failed to save product. Ensure the barcode is unique and all fields are complete.');
+      alert("Failed to save product. Ensure the barcode is unique and all fields are complete.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Delete this product?')) return;
+    if (!window.confirm("Delete this product?")) return;
     try {
       await api.delete(`/products/${id}`);
       fetchProducts();
     } catch (err) {
       console.error(err);
-      alert('Failed to delete product.');
+      alert("Failed to delete product.");
     }
   };
 
   const getStockBadge = (qty: number, threshold: number) => {
-    if (qty === 0) return 'bg-red-100 text-red-700';
-    if (qty <= threshold) return 'bg-yellow-100 text-yellow-700';
-    return 'bg-green-100 text-green-700';
+    if (qty === 0) return "bg-red-100 text-red-700";
+    if (qty <= threshold) return "bg-yellow-100 text-yellow-700";
+    return "bg-green-100 text-green-700";
   };
 
-  const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.barcode.toLowerCase().includes(search.toLowerCase()) ||
-    (p.category?.name || '').toLowerCase().includes(search.toLowerCase())
+  const filteredProducts = (Array.isArray(products) ? products : []).filter(
+    (p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.barcode.toLowerCase().includes(search.toLowerCase()) ||
+      (p.category?.name || "").toLowerCase().includes(search.toLowerCase()),
   );
+
+  useEffect(() => {
+    // Extract logged in user credentials
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      try {
+        const user = JSON.parse(userString);
+        setIsAdmin(user.role === "admin");
+      } catch (err) {
+        console.error("Error parsing user data:", err);
+      }
+    }
+
+    fetchProducts();
+    fetchCategories();
+  }, []);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 space-y-6">
@@ -172,7 +179,7 @@ const Products = () => {
         <div>
           <h2 className="text-xl font-bold text-gray-800 flex items-center">
             <Package size={22} className="mr-2 text-primary-500" />
-            {t('products')}
+            {t("products")}
           </h2>
           <p className="text-xs text-gray-500 mt-1">Manage and track your shop's inventory items</p>
         </div>
@@ -184,7 +191,7 @@ const Products = () => {
               className="flex items-center justify-center space-x-2 bg-primary-600 text-white px-4 py-2.5 rounded-xl hover:bg-primary-700 transition-colors shadow-sm font-medium text-sm w-full sm:w-auto"
             >
               <Plus size={18} />
-              <span>{t('add_product')}</span>
+              <span>{t("add_product")}</span>
             </button>
           ) : (
             <div className="flex items-center space-x-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-200 px-3 py-2 rounded-xl">
@@ -202,7 +209,7 @@ const Products = () => {
           placeholder="Search products by name, category, or barcode..."
           className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-shadow text-sm"
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
@@ -218,17 +225,17 @@ const Products = () => {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
                 <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">Image</th>
-                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">{t('name')}</th>
+                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">{t("name")}</th>
                 <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">Category</th>
                 <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">Barcode</th>
-                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">{t('price')}</th>
-                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">{t('stock')}</th>
+                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">{t("price")}</th>
+                <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">{t("stock")}</th>
                 <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm">Min. Alert</th>
-                {isAdmin && <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm text-right w-32">{t('actions')}</th>}
+                {isAdmin && <th className="py-3.5 px-4 font-semibold text-gray-600 text-sm text-right w-32">{t("actions")}</th>}
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map(product => (
+              {filteredProducts.map((product) => (
                 <tr key={product.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                   <td className="py-3 px-4">
                     <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center flex-shrink-0">
@@ -243,11 +250,9 @@ const Products = () => {
                     {product.name}
                   </td>
                   <td className="py-3 px-4 text-gray-500 text-sm">
-                    <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md text-xs font-semibold">
-                      {product.category?.name || 'Unassigned'}
-                    </span>
+                    <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md text-xs font-semibold">{product.category?.name || "Unassigned"}</span>
                   </td>
-                  <td className="py-3 px-4 text-gray-500 text-sm font-mono">{product.barcode || '-'}</td>
+                  <td className="py-3 px-4 text-gray-500 text-sm font-mono">{product.barcode || "-"}</td>
                   <td className="py-3 px-4 text-gray-800 text-sm font-semibold">${product.price.toFixed(2)}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStockBadge(product.stock_quantity, product.low_stock_threshold)}`}>
@@ -293,19 +298,17 @@ const Products = () => {
       {isModalOpen && isAdmin && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-5 sm:p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-gray-800 mb-5">
-              {editingProduct ? 'Edit Product' : t('add_product')}
-            </h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-5">{editingProduct ? "Edit Product" : t("add_product")}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Product Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('name')}</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("name")}</label>
                 <input
                   type="text"
                   className="input-field"
                   required
                   value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
 
@@ -317,7 +320,7 @@ const Products = () => {
                   className="input-field"
                   placeholder="https://images.unsplash.com/photo-..."
                   value={formData.image_url}
-                  onChange={e => setFormData({ ...formData, image_url: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                 />
                 {formData.image_url && (
                   <div className="mt-2 flex items-center space-x-2">
@@ -325,7 +328,7 @@ const Products = () => {
                       src={formData.image_url}
                       alt="Preview"
                       className="h-14 w-14 rounded-lg object-cover border border-gray-200"
-                      onError={(e) => (e.currentTarget.style.display = 'none')}
+                      onError={(e) => (e.currentTarget.style.display = "none")}
                     />
                     <span className="text-xs text-gray-400 font-mono truncate max-w-xs">{formData.image_url}</span>
                   </div>
@@ -341,14 +344,14 @@ const Products = () => {
                   placeholder="e.g. 000001"
                   required
                   value={formData.barcode}
-                  onChange={e => setFormData({ ...formData, barcode: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
                 />
               </div>
 
               {/* Price & Stock */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('price')} ($)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("price")} ($)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -356,18 +359,18 @@ const Products = () => {
                     className="input-field"
                     required
                     value={formData.price}
-                    onChange={e => setFormData({ ...formData, price: Number(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('stock')}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t("stock")}</label>
                   <input
                     type="number"
                     min="0"
                     className="input-field"
                     required
                     value={formData.stock_quantity}
-                    onChange={e => setFormData({ ...formData, stock_quantity: Number(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, stock_quantity: Number(e.target.value) })}
                   />
                 </div>
               </div>
@@ -382,7 +385,7 @@ const Products = () => {
                     className="input-field"
                     required
                     value={formData.low_stock_threshold}
-                    onChange={e => setFormData({ ...formData, low_stock_threshold: Number(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, low_stock_threshold: Number(e.target.value) })}
                   />
                 </div>
                 <div>
@@ -391,13 +394,15 @@ const Products = () => {
                     className="input-field bg-white"
                     required
                     value={formData.category_id}
-                    onChange={e => setFormData({ ...formData, category_id: Number(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, category_id: Number(e.target.value) })}
                   >
                     {categories.length === 0 ? (
                       <option value={0}>No Categories Available</option>
                     ) : (
-                      categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
                       ))
                     )}
                   </select>
@@ -411,13 +416,20 @@ const Products = () => {
                   onClick={() => setIsModalOpen(false)}
                   className="px-5 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium text-sm"
                 >
-                  {t('cancel')}
+                  {t("cancel")}
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium text-sm"
+                  disabled={isSubmitting}
+                  className="px-5 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm font-medium text-sm flex items-center gap-2"
                 >
-                  {editingProduct ? 'Update' : t('save')}
+                  {isSubmitting && (
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                  )}
+                  {isSubmitting ? 'Saving...' : (editingProduct ? "Update" : t("save"))}
                 </button>
               </div>
             </form>

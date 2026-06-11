@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import api from '../utils/api';
-import { Search, ShoppingCart, Trash2, Plus, Minus, Package, Printer } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import api from "../utils/api";
+import { Search, ShoppingCart, Trash2, Plus, Minus, Package, Printer } from "lucide-react";
 
 interface Product {
   id: number;
@@ -27,9 +27,10 @@ const POS = () => {
   const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [search, setSearch] = useState('');
-  const [barcodeInput, setBarcodeInput] = useState('');
+  const [search, setSearch] = useState("");
+  const [barcodeInput, setBarcodeInput] = useState("");
   const [lastSale, setLastSale] = useState<Sale | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -37,20 +38,20 @@ const POS = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await api.get('/products');
-      setProducts(res.data);
+      const res = await api.get("/products");
+      const data = res.data as any;
+      const items = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
+      setProducts(items);
     } catch (err) {
       console.error(err);
     }
   };
 
   const addToCart = (product: Product) => {
-    const existing = cart.find(item => item.id === product.id);
+    const existing = cart.find((item) => item.id === product.id);
     if (existing) {
       if (existing.cartQuantity < product.stock_quantity) {
-        setCart(cart.map(item =>
-          item.id === product.id ? { ...item, cartQuantity: item.cartQuantity + 1 } : item
-        ));
+        setCart(cart.map((item) => (item.id === product.id ? { ...item, cartQuantity: item.cartQuantity + 1 } : item)));
       }
     } else {
       if (product.stock_quantity > 0) {
@@ -62,22 +63,24 @@ const POS = () => {
   const handleBarcodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!barcodeInput) return;
-    const product = products.find(p => p.barcode === barcodeInput);
+    const product = products.find((p) => p.barcode === barcodeInput);
     if (product) {
       addToCart(product);
-      setBarcodeInput('');
+      setBarcodeInput("");
     } else {
-      alert('Product not found with this barcode');
+      alert("Product not found with this barcode");
     }
   };
 
   const handlePrint = (_sale: Sale) => {
-    const printContent = document.getElementById('receipt-print');
+    const printContent = document.getElementById("receipt-print");
     if (printContent) {
-      const win = window.open('', '', 'height=600,width=400');
-      win?.document.write('<html><head><title>Receipt</title><style>body{font-family:monospace;padding:20px;width:300px;}table{width:100%;border-collapse:collapse;}.text-right{text-align:right;}.border-t{border-top:1px dashed #000;margin:10px 0;}</style></head><body>');
+      const win = window.open("", "", "height=600,width=400");
+      win?.document.write(
+        "<html><head><title>Receipt</title><style>body{font-family:monospace;padding:20px;width:300px;}table{width:100%;border-collapse:collapse;}.text-right{text-align:right;}.border-t{border-top:1px dashed #000;margin:10px 0;}</style></head><body>",
+      );
       win?.document.write(printContent.innerHTML);
-      win?.document.write('</body></html>');
+      win?.document.write("</body></html>");
       win?.document.close();
       win?.focus();
       win?.print();
@@ -86,37 +89,40 @@ const POS = () => {
   };
 
   const updateQuantity = (id: number, delta: number) => {
-    setCart(cart.map(item => {
-      if (item.id === id) {
-        const newQ = item.cartQuantity + delta;
-        if (newQ > 0 && newQ <= item.stock_quantity) {
-          return { ...item, cartQuantity: newQ };
+    setCart(
+      cart.map((item) => {
+        if (item.id === id) {
+          const newQ = item.cartQuantity + delta;
+          if (newQ > 0 && newQ <= item.stock_quantity) {
+            return { ...item, cartQuantity: newQ };
+          }
+          return item;
         }
         return item;
-      }
-      return item;
-    }));
+      }),
+    );
   };
 
   const removeFromCart = (id: number) => {
-    setCart(cart.filter(item => item.id !== id));
+    setCart(cart.filter((item) => item.id !== id));
   };
 
   const checkout = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || isSubmitting) return;
+    setIsSubmitting(true);
     try {
-      const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.cartQuantity), 0);
+      const totalAmount = cart.reduce((sum, item) => sum + item.price * item.cartQuantity, 0);
 
       const payload = {
         total_amount: totalAmount,
-        items: cart.map(item => ({
+        items: cart.map((item) => ({
           product_id: item.id,
           quantity: item.cartQuantity,
-          price: item.price
-        }))
+          price: item.price,
+        })),
       };
 
-      const res = await api.post('/sales', payload);
+      const res = await api.post("/sales", payload);
 
       // Backend now returns the full sale object with items
       if (res.data && res.data.id) {
@@ -124,18 +130,18 @@ const POS = () => {
         setCart([]);
         fetchProducts();
       } else {
-        throw new Error('Invalid response from server');
+        throw new Error("Invalid response from server");
       }
     } catch (err) {
       console.error(err);
-      alert('Checkout failed! Please check the backend is running.');
+      alert("Checkout failed! Please check the backend is running.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
-  const total = cart.reduce((sum, item) => sum + (item.price * item.cartQuantity), 0);
+  const filteredProducts = products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
+  const total = cart.reduce((sum, item) => sum + item.price * item.cartQuantity, 0);
 
   return (
     <>
@@ -160,7 +166,7 @@ const POS = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
-                placeholder={t('search')}
+                placeholder={t("search")}
                 className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-shadow text-sm"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -170,14 +176,14 @@ const POS = () => {
 
           {/* Product Grid */}
           <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 bg-gray-50/30">
-            {filteredProducts.map(product => (
+            {filteredProducts.map((product) => (
               <div
                 key={product.id}
                 onClick={() => addToCart(product)}
                 className={`p-4 rounded-xl border transition-all cursor-pointer ${
                   product.stock_quantity > 0
-                    ? 'bg-white border-gray-100 hover:border-primary-300 hover:shadow-md'
-                    : 'bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed'
+                    ? "bg-white border-gray-100 hover:border-primary-300 hover:shadow-md"
+                    : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
                 }`}
               >
                 <div className="h-24 bg-primary-50 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
@@ -191,7 +197,7 @@ const POS = () => {
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-primary-600 font-bold">${product.price.toFixed(2)}</span>
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
-                    {t('stock')}: {product.stock_quantity}
+                    {t("stock")}: {product.stock_quantity}
                   </span>
                 </div>
               </div>
@@ -206,19 +212,17 @@ const POS = () => {
               <ShoppingCart className="mr-2" size={20} />
               Current Order
             </h2>
-            <span className="bg-primary-100 text-primary-700 py-1 px-3 rounded-full text-sm font-semibold">
-              {cart.length} items
-            </span>
+            <span className="bg-primary-100 text-primary-700 py-1 px-3 rounded-full text-sm font-semibold">{cart.length} items</span>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-400">
                 <ShoppingCart size={48} className="mb-4 opacity-50" />
-                <p>{t('no_items')}</p>
+                <p>{t("no_items")}</p>
               </div>
             ) : (
-              cart.map(item => (
+              cart.map((item) => (
                 <div key={item.id} className="flex flex-col p-3 border border-gray-100 rounded-xl hover:shadow-sm transition-shadow">
                   <div className="flex justify-between font-medium text-gray-800 mb-2">
                     <span>{item.name}</span>
@@ -254,19 +258,19 @@ const POS = () => {
 
           <div className="p-6 bg-gray-50 border-t border-gray-100">
             <div className="flex justify-between items-center mb-6">
-              <span className="text-gray-600 font-medium">{t('total')}</span>
+              <span className="text-gray-600 font-medium">{t("total")}</span>
               <span className="text-3xl font-bold text-gray-900">${total.toFixed(2)}</span>
             </div>
             <button
               onClick={checkout}
-              disabled={cart.length === 0}
+              disabled={cart.length === 0 || isSubmitting}
               className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center transition-all ${
-                cart.length === 0
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-primary-600 text-white hover:bg-primary-700 hover:shadow-lg transform hover:-translate-y-1'
+                cart.length === 0 || isSubmitting
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-primary-600 text-white hover:bg-primary-700 hover:shadow-lg transform hover:-translate-y-1"
               }`}
             >
-              {t('checkout')}
+              {isSubmitting ? t("processing") : t("checkout")}
             </button>
           </div>
         </div>
@@ -287,7 +291,9 @@ const POS = () => {
                 <tbody>
                   {(lastSale.items ?? []).map((item: any) => (
                     <tr key={item.id}>
-                      <td>{item.product?.name} x{item.quantity}</td>
+                      <td>
+                        {item.product?.name} x{item.quantity}
+                      </td>
                       <td className="text-right">${(item.price * item.quantity).toFixed(2)}</td>
                     </tr>
                   ))}
@@ -302,10 +308,7 @@ const POS = () => {
               </div>
             </div>
             <div className="flex space-x-3 mt-6">
-              <button
-                onClick={() => setLastSale(null)}
-                className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg font-bold"
-              >
+              <button onClick={() => setLastSale(null)} className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg font-bold">
                 Done
               </button>
               <button

@@ -33,7 +33,9 @@ const Sales = () => {
   const fetchSales = async () => {
     try {
       const res = await api.get('/sales');
-      setSales(res.data);
+      const data = res.data as any;
+      const items = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
+      setSales(items);
     } catch (err) {
       console.error(err);
     }

@@ -16,6 +16,7 @@ const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ username: '', password: '', role: 'cashier' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -32,6 +33,8 @@ const Users = () => {
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       await api.post('/register', formData);
       setIsModalOpen(false);
@@ -40,6 +43,8 @@ const Users = () => {
     } catch (err) {
       console.error(err);
       alert('Failed to add user');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -146,9 +151,16 @@ const Users = () => {
                 </button>
                 <button 
                   type="submit"
-                  className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+                  disabled={isSubmitting}
+                  className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm flex items-center gap-2"
                 >
-                  {t('save')}
+                  {isSubmitting && (
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                  )}
+                  {isSubmitting ? 'Saving...' : t('save')}
                 </button>
               </div>
             </form>

@@ -29,6 +29,7 @@ const Categories = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState(emptyCategoryForm);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     // Extract logged in user credentials
@@ -80,7 +81,8 @@ const Categories = () => {
       alert('Unauthorized! Only administrators can manage categories.');
       return;
     }
-
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       if (editingCategory) {
         await api.put(`/categories/${editingCategory.id}`, formData);
@@ -92,6 +94,8 @@ const Categories = () => {
     } catch (err) {
       console.error(err);
       alert('Failed to save category. Make sure the category name is unique.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -260,9 +264,16 @@ const Categories = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium text-sm"
+                  disabled={isSubmitting}
+                  className="px-5 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm font-medium text-sm flex items-center gap-2"
                 >
-                  {editingCategory ? t('update') : t('save')}
+                  {isSubmitting && (
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                  )}
+                  {isSubmitting ? 'Saving...' : (editingCategory ? t('update') : t('save'))}
                 </button>
               </div>
             </form>
