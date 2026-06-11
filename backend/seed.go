@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	"shop_pos_backend/config"
 	"shop_pos_backend/models"
@@ -14,25 +15,30 @@ import (
 	"gorm.io/gorm"
 )
 
-func main() {
+func SeedDatabase() {
 	godotenv.Load()
 
 	// Auto-generate asymmetric cryptographic keys for Admin and Cashier roles
 	config.GenerateRoleKeys()
 
-	// 1. Create the database if it doesn't exist
-	dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
-	db, err := sql.Open("pgx", dsn)
-	if err == nil {
-		_, err = db.Exec("CREATE DATABASE shop_pos")
-		if err != nil {
-			fmt.Println("Database may already exist (or error):", err.Error())
+	// 1. Create the database if it doesn't exist (only if running locally)
+	dbHost := os.Getenv("DB_HOST")
+	if dbHost == "localhost" || dbHost == "" {
+		dsn := "host=localhost user=postgres password=postgres port=5432 sslmode=disable"
+		db, err := sql.Open("pgx", dsn)
+		if err == nil {
+			_, err = db.Exec("CREATE DATABASE shop_pos")
+			if err != nil {
+				fmt.Println("Database may already exist (or error):", err.Error())
+			} else {
+				fmt.Println("Database shop_pos created successfully.")
+			}
+			db.Close()
 		} else {
-			fmt.Println("Database shop_pos created successfully.")
+			fmt.Println("Could not connect to base postgres to create DB:", err)
 		}
-		db.Close()
 	} else {
-		fmt.Println("Could not connect to base postgres to create DB:", err)
+		fmt.Println("Remote host detected. Skipping database creation step...")
 	}
 
 	// 2. Connect to shop_pos and migrate
