@@ -4,11 +4,14 @@ import (
 	"net/http"
 	"time"
 
+	"shop_pos_backend/cache"
 	"shop_pos_backend/config"
 	"shop_pos_backend/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+const dashboardCacheKey = "dashboard_stats"
 
 type DashboardStats struct {
 	TotalSales    int64   `json:"total_sales"`
@@ -18,6 +21,11 @@ type DashboardStats struct {
 }
 
 func GetDashboard(c *gin.Context) {
+	if cached, ok := cache.Default.Get(dashboardCacheKey); ok {
+		c.JSON(http.StatusOK, cached)
+		return
+	}
+
 	var stats DashboardStats
 
 	// Total sales count
@@ -49,9 +57,12 @@ func GetDashboard(c *gin.Context) {
 		Order("stock_quantity ASC").
 		Find(&lowStockProducts)
 
-	c.JSON(http.StatusOK, gin.H{
+	payload := gin.H{
 		"stats":              stats,
 		"recent_sales":       recentSales,
 		"low_stock_products": lowStockProducts,
-	})
+	}
+
+	cache.Default.Set(dashboardCacheKey, payload, 30*time.Second)
+	c.JSON(http.StatusOK, payload)
 }

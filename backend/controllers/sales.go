@@ -1,13 +1,21 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
+	"shop_pos_backend/cache"
 	"shop_pos_backend/config"
 	"shop_pos_backend/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+)
+
+const (
+	salesCachePrefix  = "sales_page_"
+	saleDetailsAPIKey = "sale_id_"
 )
 
 type SaleInput struct {
@@ -89,26 +97,61 @@ func CreateSale(c *gin.Context) {
 		return
 	}
 
+	cache.Default.DeletePrefix(salesCachePrefix)
+	cache.Default.DeletePrefix(saleDetailsAPIKey)
+	cache.Default.Delete("dashboard_stats")
 	c.JSON(http.StatusOK, loadedSale)
 }
 
 func GetSales(c *gin.Context) {
+	page := parsePageParam(c.Query("page"), 1)
+	pageSize := parsePageParam(c.Query("page_size"), 20)
+	if pageSize > 100 {
+		pageSize = 100
+	}
+
+	cacheKey := fmt.Sprintf("%s%d_size_%d", salesCachePrefix, page, pageSize)
+	if cached, ok := cache.Default.Get(cacheKey); ok {
+		c.JSON(http.StatusOK, cached)
+		return
+	}
+
+	var total int64
+	config.DB.Model(&models.Sale{}).Count(&total)
+
 	var sales []models.Sale
 	// Fetch physical sales records preloading user details and all item lines
-	result := config.DB.Preload("User").Preload("Items").Preload("Items.Product").Order("id DESC").Find(&sales)
+	result := config.DB.Preload("User").Preload("Items").Preload("Items.Product").Order("id DESC").Limit(pageSize).Offset((page - 1) * pageSize).Find(&sales)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve sales history"})
 		return
 	}
-	c.JSON(http.StatusOK, sales)
+
+	response := gin.H{
+		"items":     sales,
+		"page":      page,
+		"page_size": pageSize,
+		"total":     total,
+	}
+
+	cache.Default.Set(cacheKey, response, 30*time.Second)
+	c.JSON(http.StatusOK, response)
 }
 
 func GetSaleByID(c *gin.Context) {
 	id := c.Param("id")
+	cacheKey := saleDetailsAPIKey + id
+	if cached, ok := cache.Default.Get(cacheKey); ok {
+		c.JSON(http.StatusOK, cached)
+		return
+	}
+
 	var sale models.Sale
 	if result := config.DB.Preload("User").Preload("Items").Preload("Items.Product").First(&sale, id); result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Sale record not found"})
 		return
 	}
+
+	cache.Default.Set(cacheKey, sale, 30*time.Second)
 	c.JSON(http.StatusOK, sale)
 }

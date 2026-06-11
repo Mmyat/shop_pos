@@ -2,12 +2,16 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
+	"shop_pos_backend/cache"
 	"shop_pos_backend/config"
 	"shop_pos_backend/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+const categoriesCacheKey = "categories_all"
 
 func CreateCategory(c *gin.Context) {
 	var category models.Category
@@ -21,16 +25,23 @@ func CreateCategory(c *gin.Context) {
 		return
 	}
 
+	cache.Default.Delete(categoriesCacheKey)
 	c.JSON(http.StatusOK, category)
 }
 
 func GetCategories(c *gin.Context) {
+	if cached, ok := cache.Default.Get(categoriesCacheKey); ok {
+		c.JSON(http.StatusOK, cached)
+		return
+	}
+
 	var categories []models.Category
 	if result := config.DB.Find(&categories); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve categories"})
 		return
 	}
 
+	cache.Default.Set(categoriesCacheKey, categories, 2*time.Minute)
 	c.JSON(http.StatusOK, categories)
 }
 
@@ -48,6 +59,7 @@ func UpdateCategory(c *gin.Context) {
 	}
 
 	config.DB.Save(&category)
+	cache.Default.Delete(categoriesCacheKey)
 	c.JSON(http.StatusOK, category)
 }
 
@@ -58,5 +70,6 @@ func DeleteCategory(c *gin.Context) {
 		return
 	}
 
+	cache.Default.Delete(categoriesCacheKey)
 	c.JSON(http.StatusOK, gin.H{"message": "Category deleted successfully"})
 }

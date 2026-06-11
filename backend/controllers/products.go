@@ -1,13 +1,19 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
+	"shop_pos_backend/cache"
 	"shop_pos_backend/config"
 	"shop_pos_backend/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+const productsCachePrefix = "products_page_"
 
 func CreateProduct(c *gin.Context) {
 	var product models.Product
@@ -21,17 +27,52 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
+	cache.Default.DeletePrefix(productsCachePrefix)
 	c.JSON(http.StatusOK, product)
 }
 
 func GetProducts(c *gin.Context) {
+	page := parsePageParam(c.Query("page"), 1)
+	pageSize := parsePageParam(c.Query("page_size"), 20)
+	if pageSize > 100 {
+		pageSize = 100
+	}
+
+	cacheKey := fmt.Sprintf("%s%d_size_%d", productsCachePrefix, page, pageSize)
+	if cached, ok := cache.Default.Get(cacheKey); ok {
+		c.JSON(http.StatusOK, cached)
+		return
+	}
+
+	var total int64
+	config.DB.Model(&models.Product{}).Count(&total)
+
 	var products []models.Product
-	if result := config.DB.Preload("Category").Find(&products); result.Error != nil {
+	if result := config.DB.Preload("Category").Limit(pageSize).Offset((page - 1) * pageSize).Find(&products); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve products"})
 		return
 	}
 
-	c.JSON(http.StatusOK, products)
+	response := gin.H{
+		"items":     products,
+		"page":      page,
+		"page_size": pageSize,
+		"total":     total,
+	}
+
+	cache.Default.Set(cacheKey, response, 2*time.Minute)
+	c.JSON(http.StatusOK, response)
+}
+
+func parsePageParam(value string, fallback int) int {
+	if value == "" {
+		return fallback
+	}
+	parsed, err := strconv.Atoi(value)
+	if err != nil || parsed < 1 {
+		return fallback
+	}
+	return parsed
 }
 
 func UpdateProduct(c *gin.Context) {
@@ -48,6 +89,7 @@ func UpdateProduct(c *gin.Context) {
 	}
 
 	config.DB.Save(&product)
+	cache.Default.DeletePrefix(productsCachePrefix)
 	c.JSON(http.StatusOK, product)
 }
 
@@ -58,6 +100,7 @@ func DeleteProduct(c *gin.Context) {
 		return
 	}
 
+	cache.Default.DeletePrefix(productsCachePrefix)
 	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
 }
 
@@ -80,5 +123,6 @@ func UpdateStock(c *gin.Context) {
 
 	product.StockQuantity = input.Quantity
 	config.DB.Save(&product)
+	cache.Default.DeletePrefix(productsCachePrefix)
 	c.JSON(http.StatusOK, product)
 }
