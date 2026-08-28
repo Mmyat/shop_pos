@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../utils/api";
-import { Search, ShoppingCart, Trash2, Plus, Minus, Package, Printer } from "lucide-react";
+import { formatMMK } from "../utils/currency";
+import { useToast } from "../components/Toast";
+import { Search, ShoppingCart, Trash2, Plus, Minus, Package, Printer, UserPlus, X } from "lucide-react";
 
 interface Product {
   id: number;
@@ -16,6 +18,14 @@ interface CartItem extends Product {
   cartQuantity: number;
 }
 
+interface Customer {
+  id: number;
+  name: string;
+  phone: string;
+  email: string;
+  points: number;
+}
+
 interface Sale {
   id: number;
   total_amount: number;
@@ -25,6 +35,7 @@ interface Sale {
 
 const POS = () => {
   const { t } = useTranslation();
+  const toast = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [search, setSearch] = useState("");
@@ -32,18 +43,50 @@ const POS = () => {
   const [lastSale, setLastSale] = useState<Sale | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Customer / loyalty
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerSearching, setCustomerSearching] = useState(false);
+
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const fetchProducts = async () => {
     try {
-      const res = await api.get("/products");
+      const res = await api.get("/products?page_size=100");
       const data = res.data as any;
       const items = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
       setProducts(items);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const lookupCustomer = async () => {
+    const phone = customerPhone.trim();
+    if (!phone) return;
+    setCustomerSearching(true);
+    try {
+      let res;
+      try {
+        res = await api.get(`/customers/phone/${encodeURIComponent(phone)}`);
+      } catch (err: any) {
+        if (err?.response?.status === 404) {
+          // Auto-create a walk-in customer for this phone number
+          const created = await api.post("/customers", { name: `Walk-in ${phone}`, phone });
+          res = created;
+        } else {
+          throw err;
+        }
+      }
+      setCustomer(res.data as Customer);
+      toast.success(t("customer_attached"));
+    } catch (err) {
+      console.error(err);
+      toast.error(t("customer_error"));
+    } finally {
+      setCustomerSearching(false);
     }
   };
 
@@ -60,15 +103,17 @@ const POS = () => {
     }
   };
 
-  const handleBarcodeSubmit = (e: React.FormEvent) => {
+  const handleBarcodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!barcodeInput) return;
-    const product = products.find((p) => p.barcode === barcodeInput);
-    if (product) {
-      addToCart(product);
+    const code = barcodeInput.trim();
+    if (!code) return;
+    try {
+      const res = await api.get(`/products/barcode/${encodeURIComponent(code)}`);
+      addToCart(res.data as Product);
       setBarcodeInput("");
-    } else {
-      alert("Product not found with this barcode");
+      toast.success(t("added_to_cart"));
+    } catch (err) {
+      toast.error(t("barcode_not_found"));
     }
   };
 
@@ -115,6 +160,7 @@ const POS = () => {
 
       const payload = {
         total_amount: totalAmount,
+        customer_id: customer?.id || null,
         items: cart.map((item) => ({
           product_id: item.id,
           quantity: item.cartQuantity,
@@ -126,9 +172,15 @@ const POS = () => {
 
       // Backend now returns the full sale object with items
       if (res.data && res.data.id) {
+        const earned = Math.floor(totalAmount / 1000);
         setLastSale(res.data);
         setCart([]);
+        setCustomer(null);
+        setCustomerPhone("");
         fetchProducts();
+        if (earned > 0) {
+          toast.success(t("earned_points", { points: earned }));
+        }
       } else {
         throw new Error("Invalid response from server");
       }
@@ -154,7 +206,7 @@ const POS = () => {
               <Package className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-400" size={18} />
               <input
                 type="text"
-                placeholder="Scan Barcode..."
+                placeholder={t("scan_barcode")}
                 className="w-full pl-9 pr-4 py-2.5 bg-white border-2 border-primary-100 rounded-xl focus:border-primary-500 outline-none transition-all font-mono text-sm"
                 value={barcodeInput}
                 autoFocus
@@ -195,7 +247,7 @@ const POS = () => {
                 </div>
                 <h4 className="font-semibold text-gray-800 line-clamp-1">{product.name}</h4>
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-primary-600 font-bold">${product.price.toFixed(2)}</span>
+                  <span className="text-primary-600 font-bold">{formatMMK(product.price)}</span>
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
                     {t("stock")}: {product.stock_quantity}
                   </span>
@@ -215,6 +267,51 @@ const POS = () => {
             <span className="bg-primary-100 text-primary-700 py-1 px-3 rounded-full text-sm font-semibold">{cart.length} items</span>
           </div>
 
+          {/* Customer / Loyalty attach */}
+          <div className="p-4 border-b border-gray-100 bg-primary-50/40">
+            {customer ? (
+              <div className="flex items-center justify-between bg-white rounded-xl border border-primary-100 px-3 py-2">
+                <div className="flex items-center space-x-2 min-w-0">
+                  <UserPlus size={18} className="text-primary-500 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 truncate">{customer.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {t("points")}: <span className="font-bold text-primary-600">{customer.points}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setCustomer(null); setCustomerPhone(""); }}
+                  className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  title={t("clear_customer")}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-400" size={16} />
+                  <input
+                    type="text"
+                    placeholder={t("customer_phone")}
+                    className="w-full pl-8 pr-3 py-2 bg-white border border-primary-100 rounded-xl focus:border-primary-500 outline-none transition-all text-sm"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); lookupCustomer(); } }}
+                  />
+                </div>
+                <button
+                  onClick={lookupCustomer}
+                  disabled={customerSearching || !customerPhone.trim()}
+                  className="px-3 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-primary-700 transition-colors"
+                >
+                  {t("attach_customer")}
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-400">
@@ -226,7 +323,7 @@ const POS = () => {
                 <div key={item.id} className="flex flex-col p-3 border border-gray-100 rounded-xl hover:shadow-sm transition-shadow">
                   <div className="flex justify-between font-medium text-gray-800 mb-2">
                     <span>{item.name}</span>
-                    <span>${(item.price * item.cartQuantity).toFixed(2)}</span>
+                    <span>{formatMMK(item.price * item.cartQuantity)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3 bg-gray-50 rounded-lg p-1 border border-gray-100">
@@ -259,7 +356,7 @@ const POS = () => {
           <div className="p-6 bg-gray-50 border-t border-gray-100">
             <div className="flex justify-between items-center mb-6">
               <span className="text-gray-600 font-medium">{t("total")}</span>
-              <span className="text-3xl font-bold text-gray-900">${total.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-gray-900">{formatMMK(total)}</span>
             </div>
             <button
               onClick={checkout}
@@ -294,14 +391,14 @@ const POS = () => {
                       <td>
                         {item.product?.name} x{item.quantity}
                       </td>
-                      <td className="text-right">${(item.price * item.quantity).toFixed(2)}</td>
+                      <td className="text-right">{formatMMK(item.price * item.quantity)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               <div className="border-t pt-2 font-bold flex justify-between">
                 <span>TOTAL</span>
-                <span>${lastSale.total_amount.toFixed(2)}</span>
+                 <span>{formatMMK(lastSale.total_amount)}</span>
               </div>
               <div className="text-center mt-6">
                 <p>Thank You!</p>

@@ -11,7 +11,7 @@ import (
 
 func GetUsers(c *gin.Context) {
 	var users []models.User
-	if result := config.DB.Find(&users); result.Error != nil {
+	if result := config.DB.Where("is_deleted = ?", false).Find(&users); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
 		return
 	}
@@ -22,7 +22,7 @@ func GetUsers(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
-	if result := config.DB.First(&user, id); result.Error != nil {
+	if result := config.DB.Where("is_deleted = ?", false).First(&user, id); result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -46,7 +46,7 @@ func UpdateUser(c *gin.Context) {
 
 func DeleteUser(c *gin.Context) {
 	id := c.Param("id")
-	if result := config.DB.Delete(&models.User{}, id); result.Error != nil {
+	if result := config.DB.Model(&models.User{}).Where("id = ?", id).Update("is_deleted", true); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
 		return
 	}

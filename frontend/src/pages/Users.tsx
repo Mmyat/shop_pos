@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
-import { UserPlus, UserCircle, Shield, Trash2, Edit2, Eye, EyeOff } from 'lucide-react';
+import { useToast } from '../components/Toast';
+import { UserPlus, UserCircle, Shield, Trash2, Edit2, Eye, EyeOff, Search } from 'lucide-react';
 
 interface User {
   id: number;
@@ -12,7 +13,9 @@ interface User {
 
 const Users = () => {
   const { t } = useTranslation();
+  const toast = useToast();
   const [users, setUsers] = useState<User[]>([]);
+  const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ username: '', password: '', role: 'cashier' });
@@ -28,6 +31,7 @@ const Users = () => {
       setUsers(res.data);
     } catch (err) {
       console.error(err);
+      toast.error('Failed to load users.');
     }
   };
 
@@ -40,9 +44,10 @@ const Users = () => {
       setIsModalOpen(false);
       fetchUsers();
       setFormData({ username: '', password: '', role: 'cashier' });
+      toast.success('User created successfully.');
     } catch (err) {
       console.error(err);
-      alert('Failed to add user');
+      toast.error('Failed to add user. Username may already be taken.');
     } finally {
       setIsSubmitting(false);
     }
@@ -53,31 +58,50 @@ const Users = () => {
     try {
       await api.delete(`/users/${id}`);
       fetchUsers();
+      toast.success('User deleted.');
     } catch (err) {
       console.error(err);
+      toast.error('Failed to delete user.');
     }
   };
 
+  const filteredUsers = users.filter((u) =>
+    u.username.toLowerCase().includes(search.toLowerCase()) ||
+    u.role.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-800">{t('users')}</h2>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-        >
-          <UserPlus size={18} />
-          <span>{t('add_user')}</span>
-        </button>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t('users')}</h2>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search users..."
+              className="pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-shadow text-sm"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center space-x-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+          >
+            <UserPlus size={18} />
+            <span>{t('add_user')}</span>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {users.map(user => (
+        {filteredUsers.map(user => (
           <div key={user.id} className="p-6 rounded-2xl border border-gray-100 hover:shadow-md transition-all flex flex-col items-center text-center">
             <div className={`p-4 rounded-full mb-4 ${user.role === 'admin' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
               {user.role === 'admin' ? <Shield size={32} /> : <UserCircle size={32} />}
             </div>
-            <h3 className="text-lg font-bold text-gray-800">{user.username}</h3>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">{user.username}</h3>
             <span className={`mt-1 px-3 py-1 rounded-full text-xs font-bold uppercase ${user.role === 'admin' ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
               {user.role}
             </span>
@@ -85,7 +109,7 @@ const Users = () => {
               <button className="text-gray-400 hover:text-primary-600">
                 <Edit2 size={18} />
               </button>
-              <button 
+              <button
                 onClick={() => handleDelete(user.id)}
                 className="text-gray-400 hover:text-red-500"
               >
@@ -94,6 +118,9 @@ const Users = () => {
             </div>
           </div>
         ))}
+        {filteredUsers.length === 0 && (
+          <p className="col-span-full text-center text-gray-400 py-10">No users found.</p>
+        )}
       </div>
 
       {isModalOpen && (

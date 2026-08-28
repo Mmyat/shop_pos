@@ -2,7 +2,8 @@ package main
 
 import (
 	"log"
-	"shop_pos_backend/cache"
+	"os"
+
 	"shop_pos_backend/config"
 	"shop_pos_backend/models"
 	"shop_pos_backend/routes"
@@ -19,23 +20,23 @@ func main() {
 		log.Println("Error loading .env file, relying on environment variables")
 	}
 
-	// Auto-generate asymmetric cryptographic keys for Admin and Cashier roles
-	config.GenerateRoleKeys()
-
-	// Initialize Redis cache if configured
-	if err := cache.InitRedis(); err != nil {
-		log.Printf("Redis cache disabled: %v", err)
-	}
-
 	// Connect to Database
 	config.ConnectDB()
 
 	// Migrate Models
-	config.DB.AutoMigrate(&models.User{}, &models.Category{}, &models.Product{}, &models.Sale{}, &models.SaleItem{})
+	config.DB.AutoMigrate(&models.User{}, &models.Category{}, &models.Product{}, &models.Sale{}, &models.SaleItem{}, &models.Customer{})
+
+	// Seed demo data when explicitly enabled (truncates & reloads catalog)
+	if os.Getenv("SEED") == "true" {
+		SeedDatabase()
+	}
 
 	// Create a default admin user if none exists
 	var admin models.User
 	if err := config.DB.Where("username = ?", "admin").First(&admin).Error; err != nil {
+		// Admin not found, create one
+		// This password should be hashed in production properly, but we'll use a hashed "admin" here.
+		// password := "$2a$10$wE9... " - for simplicity, we'll let them register an admin or just use a basic hash
 		log.Println("No admin found. You might want to register a user.")
 	}
 

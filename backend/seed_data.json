@@ -1,0 +1,1106 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "Beverages",
+      "description": "Soft drinks, juices, water, tea and coffee"
+    },
+    {
+      "id": 2,
+      "name": "Snacks",
+      "description": "Chips, crackers, biscuits and quick bites"
+    },
+    {
+      "id": 3,
+      "name": "Rice & Grains",
+      "description": "Staple rice, noodles and grains"
+    },
+    {
+      "id": 4,
+      "name": "Noodles & Instant Food",
+      "description": "Instant noodles and ready-to-eat meals"
+    },
+    {
+      "id": 5,
+      "name": "Cooking & Condiments",
+      "description": "Cooking oil, sauces, spices and seasonings"
+    },
+    {
+      "id": 6,
+      "name": "Dairy & Eggs",
+      "description": "Milk, butter, eggs and yogurt"
+    },
+    {
+      "id": 7,
+      "name": "Household & Cleaning",
+      "description": "Detergents, cleaners and home essentials"
+    },
+    {
+      "id": 8,
+      "name": "Personal Care",
+      "description": "Soap, shampoo, oral and body care"
+    },
+    {
+      "id": 9,
+      "name": "Baby Care",
+      "description": "Diapers, wipes and baby hygiene"
+    },
+    {
+      "id": 10,
+      "name": "Health & Medicine",
+      "description": "Basic OTC medicine and supplements"
+    },
+    {
+      "id": 11,
+      "name": "Frozen Food",
+      "description": "Frozen meals, meat and vegetables"
+    },
+    {
+      "id": 12,
+      "name": "Bakery",
+      "description": "Bread, buns and baked goods"
+    },
+    {
+      "id": 13,
+      "name": "Fruits & Vegetables",
+      "description": "Fresh local produce"
+    },
+    {
+      "id": 14,
+      "name": "Canned & Preserved",
+      "description": "Canned fish, meat and preserved food"
+    },
+    {
+      "id": 15,
+      "name": "Confectionery & Sweets",
+      "description": "Chocolates, candies and sweets"
+    },
+    {
+      "id": 16,
+      "name": "Tea & Coffee",
+      "description": "Local and international tea and coffee"
+    },
+    {
+      "id": 17,
+      "name": "Stationery & Office",
+      "description": "Pens, paper and office supplies"
+    },
+    {
+      "id": 18,
+      "name": "Pet Care",
+      "description": "Pet food and accessories"
+    },
+    {
+      "id": 19,
+      "name": "Mobile & Accessories",
+      "description": "Chargers, cables and phone accessories"
+    },
+    {
+      "id": 20,
+      "name": "Beauty & Cosmetics",
+      "description": "Makeup, skincare and grooming"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "category_id": 1,
+      "name": "Coca Cola 1L",
+      "price": 2600,
+      "stock_quantity": 107,
+      "low_stock_threshold": 11,
+      "barcode": "100001",
+      "image_url": "https://picsum.photos/seed/prod1/300/300"
+    },
+    {
+      "id": 2,
+      "category_id": 1,
+      "name": "Orange Juice 1L",
+      "price": 18050,
+      "stock_quantity": 12,
+      "low_stock_threshold": 8,
+      "barcode": "100002",
+      "image_url": "https://picsum.photos/seed/prod2/300/300"
+    },
+    {
+      "id": 3,
+      "category_id": 1,
+      "name": "Purified Water 500ml",
+      "price": 10050,
+      "stock_quantity": 3,
+      "low_stock_threshold": 12,
+      "barcode": "100003",
+      "image_url": "https://picsum.photos/seed/prod3/300/300"
+    },
+    {
+      "id": 4,
+      "category_id": 1,
+      "name": "Green Tea Bottle 350ml",
+      "price": 19750,
+      "stock_quantity": 12,
+      "low_stock_threshold": 5,
+      "barcode": "100004",
+      "image_url": "https://picsum.photos/seed/prod4/300/300"
+    },
+    {
+      "id": 5,
+      "category_id": 1,
+      "name": "Energy Drink 250ml",
+      "price": 3900,
+      "stock_quantity": 20,
+      "low_stock_threshold": 4,
+      "barcode": "100005",
+      "image_url": "https://picsum.photos/seed/prod5/300/300"
+    },
+    {
+      "id": 6,
+      "category_id": 2,
+      "name": "Potato Chips 70g",
+      "price": 14500,
+      "stock_quantity": 40,
+      "low_stock_threshold": 9,
+      "barcode": "100006",
+      "image_url": "https://picsum.photos/seed/prod6/300/300"
+    },
+    {
+      "id": 7,
+      "category_id": 2,
+      "name": "Prawn Crackers 150g",
+      "price": 2950,
+      "stock_quantity": 6,
+      "low_stock_threshold": 5,
+      "barcode": "100007",
+      "image_url": "https://picsum.photos/seed/prod7/300/300"
+    },
+    {
+      "id": 8,
+      "category_id": 2,
+      "name": "Chocolate Cookies",
+      "price": 10400,
+      "stock_quantity": 74,
+      "low_stock_threshold": 5,
+      "barcode": "100008",
+      "image_url": "https://picsum.photos/seed/prod8/300/300"
+    },
+    {
+      "id": 9,
+      "category_id": 2,
+      "name": "Peanut Snack Pack",
+      "price": 18550,
+      "stock_quantity": 46,
+      "low_stock_threshold": 6,
+      "barcode": "100009",
+      "image_url": "https://picsum.photos/seed/prod9/300/300"
+    },
+    {
+      "id": 10,
+      "category_id": 2,
+      "name": "Mixed Nuts 200g",
+      "price": 8350,
+      "stock_quantity": 110,
+      "low_stock_threshold": 12,
+      "barcode": "100010",
+      "image_url": "https://picsum.photos/seed/prod10/300/300"
+    },
+    {
+      "id": 11,
+      "category_id": 3,
+      "name": "Long Grain Rice 1kg",
+      "price": 17300,
+      "stock_quantity": 101,
+      "low_stock_threshold": 11,
+      "barcode": "100011",
+      "image_url": "https://picsum.photos/seed/prod11/300/300"
+    },
+    {
+      "id": 12,
+      "category_id": 3,
+      "name": "Jasmine Rice 5kg",
+      "price": 4450,
+      "stock_quantity": 14,
+      "low_stock_threshold": 8,
+      "barcode": "100012",
+      "image_url": "https://picsum.photos/seed/prod12/300/300"
+    },
+    {
+      "id": 13,
+      "category_id": 3,
+      "name": "Rice Noodles 400g",
+      "price": 5950,
+      "stock_quantity": 101,
+      "low_stock_threshold": 12,
+      "barcode": "100013",
+      "image_url": "https://picsum.photos/seed/prod13/300/300"
+    },
+    {
+      "id": 14,
+      "category_id": 3,
+      "name": "Instant Oats 500g",
+      "price": 5550,
+      "stock_quantity": 89,
+      "low_stock_threshold": 4,
+      "barcode": "100014",
+      "image_url": "https://picsum.photos/seed/prod14/300/300"
+    },
+    {
+      "id": 15,
+      "category_id": 3,
+      "name": "Red Lentils 1kg",
+      "price": 3950,
+      "stock_quantity": 46,
+      "low_stock_threshold": 12,
+      "barcode": "100015",
+      "image_url": "https://picsum.photos/seed/prod15/300/300"
+    },
+    {
+      "id": 16,
+      "category_id": 4,
+      "name": "Chicken Noodles 5pack",
+      "price": 2050,
+      "stock_quantity": 104,
+      "low_stock_threshold": 11,
+      "barcode": "100016",
+      "image_url": "https://picsum.photos/seed/prod16/300/300"
+    },
+    {
+      "id": 17,
+      "category_id": 4,
+      "name": "Shrimp Noodles 5pack",
+      "price": 11900,
+      "stock_quantity": 86,
+      "low_stock_threshold": 12,
+      "barcode": "100017",
+      "image_url": "https://picsum.photos/seed/prod17/300/300"
+    },
+    {
+      "id": 18,
+      "category_id": 4,
+      "name": "Cup Noodles Beef",
+      "price": 10250,
+      "stock_quantity": 84,
+      "low_stock_threshold": 11,
+      "barcode": "100018",
+      "image_url": "https://picsum.photos/seed/prod18/300/300"
+    },
+    {
+      "id": 19,
+      "category_id": 4,
+      "name": "Instant Porridge Bowl",
+      "price": 14550,
+      "stock_quantity": 75,
+      "low_stock_threshold": 13,
+      "barcode": "100019",
+      "image_url": "https://picsum.photos/seed/prod19/300/300"
+    },
+    {
+      "id": 20,
+      "category_id": 4,
+      "name": "Curry Noodles 5pack",
+      "price": 14850,
+      "stock_quantity": 84,
+      "low_stock_threshold": 12,
+      "barcode": "100020",
+      "image_url": "https://picsum.photos/seed/prod20/300/300"
+    },
+    {
+      "id": 21,
+      "category_id": 5,
+      "name": "Palm Cooking Oil 1L",
+      "price": 5600,
+      "stock_quantity": 85,
+      "low_stock_threshold": 7,
+      "barcode": "100021",
+      "image_url": "https://picsum.photos/seed/prod21/300/300"
+    },
+    {
+      "id": 22,
+      "category_id": 5,
+      "name": "Soy Sauce 500ml",
+      "price": 9050,
+      "stock_quantity": 74,
+      "low_stock_threshold": 4,
+      "barcode": "100022",
+      "image_url": "https://picsum.photos/seed/prod22/300/300"
+    },
+    {
+      "id": 23,
+      "category_id": 5,
+      "name": "Fish Sauce 700ml",
+      "price": 2450,
+      "stock_quantity": 38,
+      "low_stock_threshold": 11,
+      "barcode": "100023",
+      "image_url": "https://picsum.photos/seed/prod23/300/300"
+    },
+    {
+      "id": 24,
+      "category_id": 5,
+      "name": "Tomato Ketchup 340g",
+      "price": 3800,
+      "stock_quantity": 39,
+      "low_stock_threshold": 12,
+      "barcode": "100024",
+      "image_url": "https://picsum.photos/seed/prod24/300/300"
+    },
+    {
+      "id": 25,
+      "category_id": 5,
+      "name": "Chili Paste 200g",
+      "price": 11750,
+      "stock_quantity": 75,
+      "low_stock_threshold": 7,
+      "barcode": "100025",
+      "image_url": "https://picsum.photos/seed/prod25/300/300"
+    },
+    {
+      "id": 26,
+      "category_id": 6,
+      "name": "Fresh Milk 1L",
+      "price": 7200,
+      "stock_quantity": 104,
+      "low_stock_threshold": 4,
+      "barcode": "100026",
+      "image_url": "https://picsum.photos/seed/prod26/300/300"
+    },
+    {
+      "id": 27,
+      "category_id": 6,
+      "name": "Condensed Milk 380g",
+      "price": 9900,
+      "stock_quantity": 98,
+      "low_stock_threshold": 5,
+      "barcode": "100027",
+      "image_url": "https://picsum.photos/seed/prod27/300/300"
+    },
+    {
+      "id": 28,
+      "category_id": 6,
+      "name": "Egg Tray 10pcs",
+      "price": 16900,
+      "stock_quantity": 21,
+      "low_stock_threshold": 10,
+      "barcode": "100028",
+      "image_url": "https://picsum.photos/seed/prod28/300/300"
+    },
+    {
+      "id": 29,
+      "category_id": 6,
+      "name": "Butter 250g",
+      "price": 12350,
+      "stock_quantity": 77,
+      "low_stock_threshold": 12,
+      "barcode": "100029",
+      "image_url": "https://picsum.photos/seed/prod29/300/300"
+    },
+    {
+      "id": 30,
+      "category_id": 6,
+      "name": "Yogurt Cup 100g",
+      "price": 12450,
+      "stock_quantity": 19,
+      "low_stock_threshold": 11,
+      "barcode": "100030",
+      "image_url": "https://picsum.photos/seed/prod30/300/300"
+    },
+    {
+      "id": 31,
+      "category_id": 7,
+      "name": "Dishwashing Liquid 500ml",
+      "price": 16350,
+      "stock_quantity": 105,
+      "low_stock_threshold": 12,
+      "barcode": "100031",
+      "image_url": "https://picsum.photos/seed/prod31/300/300"
+    },
+    {
+      "id": 32,
+      "category_id": 7,
+      "name": "Laundry Detergent 1kg",
+      "price": 10600,
+      "stock_quantity": 96,
+      "low_stock_threshold": 6,
+      "barcode": "100032",
+      "image_url": "https://picsum.photos/seed/prod32/300/300"
+    },
+    {
+      "id": 33,
+      "category_id": 7,
+      "name": "Multi Cleaner 500ml",
+      "price": 11300,
+      "stock_quantity": 115,
+      "low_stock_threshold": 12,
+      "barcode": "100033",
+      "image_url": "https://picsum.photos/seed/prod33/300/300"
+    },
+    {
+      "id": 34,
+      "category_id": 7,
+      "name": "Garbage Bags 30pcs",
+      "price": 4350,
+      "stock_quantity": 77,
+      "low_stock_threshold": 9,
+      "barcode": "100034",
+      "image_url": "https://picsum.photos/seed/prod34/300/300"
+    },
+    {
+      "id": 35,
+      "category_id": 7,
+      "name": "Paper Towels 2ply",
+      "price": 17400,
+      "stock_quantity": 35,
+      "low_stock_threshold": 11,
+      "barcode": "100035",
+      "image_url": "https://picsum.photos/seed/prod35/300/300"
+    },
+    {
+      "id": 36,
+      "category_id": 8,
+      "name": "Antibacterial Soap 90g",
+      "price": 15700,
+      "stock_quantity": 17,
+      "low_stock_threshold": 3,
+      "barcode": "100036",
+      "image_url": "https://picsum.photos/seed/prod36/300/300"
+    },
+    {
+      "id": 37,
+      "category_id": 8,
+      "name": "Shampoo 200ml",
+      "price": 12750,
+      "stock_quantity": 51,
+      "low_stock_threshold": 3,
+      "barcode": "100037",
+      "image_url": "https://picsum.photos/seed/prod37/300/300"
+    },
+    {
+      "id": 38,
+      "category_id": 8,
+      "name": "Toothpaste 100g",
+      "price": 7150,
+      "stock_quantity": 33,
+      "low_stock_threshold": 9,
+      "barcode": "100038",
+      "image_url": "https://picsum.photos/seed/prod38/300/300"
+    },
+    {
+      "id": 39,
+      "category_id": 8,
+      "name": "Toilet Paper 10 rolls",
+      "price": 5800,
+      "stock_quantity": 83,
+      "low_stock_threshold": 5,
+      "barcode": "100039",
+      "image_url": "https://picsum.photos/seed/prod39/300/300"
+    },
+    {
+      "id": 40,
+      "category_id": 8,
+      "name": "Hand Sanitizer 100ml",
+      "price": 13000,
+      "stock_quantity": 55,
+      "low_stock_threshold": 11,
+      "barcode": "100040",
+      "image_url": "https://picsum.photos/seed/prod40/300/300"
+    },
+    {
+      "id": 41,
+      "category_id": 9,
+      "name": "Baby Diapers M 20pcs",
+      "price": 1300,
+      "stock_quantity": 56,
+      "low_stock_threshold": 6,
+      "barcode": "100041",
+      "image_url": "https://picsum.photos/seed/prod41/300/300"
+    },
+    {
+      "id": 42,
+      "category_id": 9,
+      "name": "Baby Wipes 80pcs",
+      "price": 19800,
+      "stock_quantity": 34,
+      "low_stock_threshold": 4,
+      "barcode": "100042",
+      "image_url": "https://picsum.photos/seed/prod42/300/300"
+    },
+    {
+      "id": 43,
+      "category_id": 9,
+      "name": "Baby Powder 100g",
+      "price": 5200,
+      "stock_quantity": 39,
+      "low_stock_threshold": 3,
+      "barcode": "100043",
+      "image_url": "https://picsum.photos/seed/prod43/300/300"
+    },
+    {
+      "id": 44,
+      "category_id": 9,
+      "name": "Baby Lotion 200ml",
+      "price": 12050,
+      "stock_quantity": 50,
+      "low_stock_threshold": 13,
+      "barcode": "100044",
+      "image_url": "https://picsum.photos/seed/prod44/300/300"
+    },
+    {
+      "id": 45,
+      "category_id": 9,
+      "name": "Baby Shampoo 100ml",
+      "price": 3300,
+      "stock_quantity": 31,
+      "low_stock_threshold": 6,
+      "barcode": "100045",
+      "image_url": "https://picsum.photos/seed/prod45/300/300"
+    },
+    {
+      "id": 46,
+      "category_id": 10,
+      "name": "Paracetamol 10 tabs",
+      "price": 7750,
+      "stock_quantity": 82,
+      "low_stock_threshold": 11,
+      "barcode": "100046",
+      "image_url": "https://picsum.photos/seed/prod46/300/300"
+    },
+    {
+      "id": 47,
+      "category_id": 10,
+      "name": "Vitamin C 30 tabs",
+      "price": 18850,
+      "stock_quantity": 20,
+      "low_stock_threshold": 11,
+      "barcode": "100047",
+      "image_url": "https://picsum.photos/seed/prod47/300/300"
+    },
+    {
+      "id": 48,
+      "category_id": 10,
+      "name": "ORS Sachet",
+      "price": 10450,
+      "stock_quantity": 3,
+      "low_stock_threshold": 5,
+      "barcode": "100048",
+      "image_url": "https://picsum.photos/seed/prod48/300/300"
+    },
+    {
+      "id": 49,
+      "category_id": 10,
+      "name": "First Aid Plaster 20pcs",
+      "price": 8400,
+      "stock_quantity": 110,
+      "low_stock_threshold": 3,
+      "barcode": "100049",
+      "image_url": "https://picsum.photos/seed/prod49/300/300"
+    },
+    {
+      "id": 50,
+      "category_id": 10,
+      "name": "Cough Syrup 100ml",
+      "price": 20200,
+      "stock_quantity": 47,
+      "low_stock_threshold": 3,
+      "barcode": "100050",
+      "image_url": "https://picsum.photos/seed/prod50/300/300"
+    },
+    {
+      "id": 51,
+      "category_id": 11,
+      "name": "Chicken Nuggets 400g",
+      "price": 13700,
+      "stock_quantity": 27,
+      "low_stock_threshold": 11,
+      "barcode": "100051",
+      "image_url": "https://picsum.photos/seed/prod51/300/300"
+    },
+    {
+      "id": 52,
+      "category_id": 11,
+      "name": "Mixed Vegetables 300g",
+      "price": 12150,
+      "stock_quantity": 41,
+      "low_stock_threshold": 11,
+      "barcode": "100052",
+      "image_url": "https://picsum.photos/seed/prod52/300/300"
+    },
+    {
+      "id": 53,
+      "category_id": 11,
+      "name": "Fish Fillet 500g",
+      "price": 14650,
+      "stock_quantity": 48,
+      "low_stock_threshold": 14,
+      "barcode": "100053",
+      "image_url": "https://picsum.photos/seed/prod53/300/300"
+    },
+    {
+      "id": 54,
+      "category_id": 11,
+      "name": "Ice Cream 1L",
+      "price": 7750,
+      "stock_quantity": 100,
+      "low_stock_threshold": 9,
+      "barcode": "100054",
+      "image_url": "https://picsum.photos/seed/prod54/300/300"
+    },
+    {
+      "id": 55,
+      "category_id": 11,
+      "name": "French Fries 500g",
+      "price": 8350,
+      "stock_quantity": 29,
+      "low_stock_threshold": 8,
+      "barcode": "100055",
+      "image_url": "https://picsum.photos/seed/prod55/300/300"
+    },
+    {
+      "id": 56,
+      "category_id": 12,
+      "name": "White Bread",
+      "price": 2050,
+      "stock_quantity": 2,
+      "low_stock_threshold": 10,
+      "barcode": "100056",
+      "image_url": "https://picsum.photos/seed/prod56/300/300"
+    },
+    {
+      "id": 57,
+      "category_id": 12,
+      "name": "Whole Wheat Bread",
+      "price": 20050,
+      "stock_quantity": 32,
+      "low_stock_threshold": 7,
+      "barcode": "100057",
+      "image_url": "https://picsum.photos/seed/prod57/300/300"
+    },
+    {
+      "id": 58,
+      "category_id": 12,
+      "name": "Butter Croissant",
+      "price": 1000,
+      "stock_quantity": 84,
+      "low_stock_threshold": 13,
+      "barcode": "100058",
+      "image_url": "https://picsum.photos/seed/prod58/300/300"
+    },
+    {
+      "id": 59,
+      "category_id": 12,
+      "name": "Cream Roll",
+      "price": 12100,
+      "stock_quantity": 78,
+      "low_stock_threshold": 12,
+      "barcode": "100059",
+      "image_url": "https://picsum.photos/seed/prod59/300/300"
+    },
+    {
+      "id": 60,
+      "category_id": 12,
+      "name": "Donut Pack 4",
+      "price": 19850,
+      "stock_quantity": 78,
+      "low_stock_threshold": 5,
+      "barcode": "100060",
+      "image_url": "https://picsum.photos/seed/prod60/300/300"
+    },
+    {
+      "id": 61,
+      "category_id": 13,
+      "name": "Bananas per bunch",
+      "price": 11500,
+      "stock_quantity": 21,
+      "low_stock_threshold": 9,
+      "barcode": "100061",
+      "image_url": "https://picsum.photos/seed/prod61/300/300"
+    },
+    {
+      "id": 62,
+      "category_id": 13,
+      "name": "Apples per kg",
+      "price": 20050,
+      "stock_quantity": 110,
+      "low_stock_threshold": 14,
+      "barcode": "100062",
+      "image_url": "https://picsum.photos/seed/prod62/300/300"
+    },
+    {
+      "id": 63,
+      "category_id": 13,
+      "name": "Tomatoes per kg",
+      "price": 7600,
+      "stock_quantity": 115,
+      "low_stock_threshold": 12,
+      "barcode": "100063",
+      "image_url": "https://picsum.photos/seed/prod63/300/300"
+    },
+    {
+      "id": 64,
+      "category_id": 13,
+      "name": "Onions per kg",
+      "price": 13650,
+      "stock_quantity": 86,
+      "low_stock_threshold": 5,
+      "barcode": "100064",
+      "image_url": "https://picsum.photos/seed/prod64/300/300"
+    },
+    {
+      "id": 65,
+      "category_id": 13,
+      "name": "Potatoes per kg",
+      "price": 14600,
+      "stock_quantity": 34,
+      "low_stock_threshold": 5,
+      "barcode": "100065",
+      "image_url": "https://picsum.photos/seed/prod65/300/300"
+    },
+    {
+      "id": 66,
+      "category_id": 14,
+      "name": "Canned Sardines 155g",
+      "price": 9200,
+      "stock_quantity": 29,
+      "low_stock_threshold": 4,
+      "barcode": "100066",
+      "image_url": "https://picsum.photos/seed/prod66/300/300"
+    },
+    {
+      "id": 67,
+      "category_id": 14,
+      "name": "Canned Tuna 185g",
+      "price": 12450,
+      "stock_quantity": 75,
+      "low_stock_threshold": 5,
+      "barcode": "100067",
+      "image_url": "https://picsum.photos/seed/prod67/300/300"
+    },
+    {
+      "id": 68,
+      "category_id": 14,
+      "name": "Corn Kernel 400g",
+      "price": 750,
+      "stock_quantity": 99,
+      "low_stock_threshold": 10,
+      "barcode": "100068",
+      "image_url": "https://picsum.photos/seed/prod68/300/300"
+    },
+    {
+      "id": 69,
+      "category_id": 14,
+      "name": "Baked Beans 420g",
+      "price": 1800,
+      "stock_quantity": 16,
+      "low_stock_threshold": 14,
+      "barcode": "100069",
+      "image_url": "https://picsum.photos/seed/prod69/300/300"
+    },
+    {
+      "id": 70,
+      "category_id": 14,
+      "name": "Coconut Milk 400ml",
+      "price": 8200,
+      "stock_quantity": 47,
+      "low_stock_threshold": 3,
+      "barcode": "100070",
+      "image_url": "https://picsum.photos/seed/prod70/300/300"
+    },
+    {
+      "id": 71,
+      "category_id": 15,
+      "name": "Milk Chocolate Bar",
+      "price": 9050,
+      "stock_quantity": 29,
+      "low_stock_threshold": 11,
+      "barcode": "100071",
+      "image_url": "https://picsum.photos/seed/prod71/300/300"
+    },
+    {
+      "id": 72,
+      "category_id": 15,
+      "name": "Candy Mix 100g",
+      "price": 14950,
+      "stock_quantity": 54,
+      "low_stock_threshold": 7,
+      "barcode": "100072",
+      "image_url": "https://picsum.photos/seed/prod72/300/300"
+    },
+    {
+      "id": 73,
+      "category_id": 15,
+      "name": "Gummy Bears 80g",
+      "price": 6300,
+      "stock_quantity": 80,
+      "low_stock_threshold": 13,
+      "barcode": "100073",
+      "image_url": "https://picsum.photos/seed/prod73/300/300"
+    },
+    {
+      "id": 74,
+      "category_id": 15,
+      "name": "Lollipop 12pcs",
+      "price": 1250,
+      "stock_quantity": 70,
+      "low_stock_threshold": 8,
+      "barcode": "100074",
+      "image_url": "https://picsum.photos/seed/prod74/300/300"
+    },
+    {
+      "id": 75,
+      "category_id": 15,
+      "name": "Wafer Roll 150g",
+      "price": 3900,
+      "stock_quantity": 8,
+      "low_stock_threshold": 7,
+      "barcode": "100075",
+      "image_url": "https://picsum.photos/seed/prod75/300/300"
+    },
+    {
+      "id": 76,
+      "category_id": 16,
+      "name": "Burmese Laphet Tea 100g",
+      "price": 4100,
+      "stock_quantity": 41,
+      "low_stock_threshold": 14,
+      "barcode": "100076",
+      "image_url": "https://picsum.photos/seed/prod76/300/300"
+    },
+    {
+      "id": 77,
+      "category_id": 16,
+      "name": "English Breakfast Tea 200g",
+      "price": 15250,
+      "stock_quantity": 114,
+      "low_stock_threshold": 4,
+      "barcode": "100077",
+      "image_url": "https://picsum.photos/seed/prod77/300/300"
+    },
+    {
+      "id": 78,
+      "category_id": 16,
+      "name": "Instant Coffee 100g",
+      "price": 8200,
+      "stock_quantity": 102,
+      "low_stock_threshold": 3,
+      "barcode": "100078",
+      "image_url": "https://picsum.photos/seed/prod78/300/300"
+    },
+    {
+      "id": 79,
+      "category_id": 16,
+      "name": "Ground Coffee 250g",
+      "price": 2250,
+      "stock_quantity": 104,
+      "low_stock_threshold": 14,
+      "barcode": "100079",
+      "image_url": "https://picsum.photos/seed/prod79/300/300"
+    },
+    {
+      "id": 80,
+      "category_id": 16,
+      "name": "Green Tea 50 bags",
+      "price": 15050,
+      "stock_quantity": 51,
+      "low_stock_threshold": 10,
+      "barcode": "100080",
+      "image_url": "https://picsum.photos/seed/prod80/300/300"
+    },
+    {
+      "id": 81,
+      "category_id": 17,
+      "name": "Ballpoint Pen 10pcs",
+      "price": 1350,
+      "stock_quantity": 47,
+      "low_stock_threshold": 8,
+      "barcode": "100081",
+      "image_url": "https://picsum.photos/seed/prod81/300/300"
+    },
+    {
+      "id": 82,
+      "category_id": 17,
+      "name": "A4 Paper 100 sheets",
+      "price": 7250,
+      "stock_quantity": 98,
+      "low_stock_threshold": 9,
+      "barcode": "100082",
+      "image_url": "https://picsum.photos/seed/prod82/300/300"
+    },
+    {
+      "id": 83,
+      "category_id": 17,
+      "name": "Notebook A5",
+      "price": 1550,
+      "stock_quantity": 27,
+      "low_stock_threshold": 11,
+      "barcode": "100083",
+      "image_url": "https://picsum.photos/seed/prod83/300/300"
+    },
+    {
+      "id": 84,
+      "category_id": 17,
+      "name": "Sticky Notes 5pads",
+      "price": 10050,
+      "stock_quantity": 59,
+      "low_stock_threshold": 9,
+      "barcode": "100084",
+      "image_url": "https://picsum.photos/seed/prod84/300/300"
+    },
+    {
+      "id": 85,
+      "category_id": 17,
+      "name": "Correction Tape",
+      "price": 5500,
+      "stock_quantity": 118,
+      "low_stock_threshold": 9,
+      "barcode": "100085",
+      "image_url": "https://picsum.photos/seed/prod85/300/300"
+    },
+    {
+      "id": 86,
+      "category_id": 18,
+      "name": "Dog Food 1kg",
+      "price": 1650,
+      "stock_quantity": 58,
+      "low_stock_threshold": 3,
+      "barcode": "100086",
+      "image_url": "https://picsum.photos/seed/prod86/300/300"
+    },
+    {
+      "id": 87,
+      "category_id": 18,
+      "name": "Cat Food 500g",
+      "price": 18150,
+      "stock_quantity": 119,
+      "low_stock_threshold": 4,
+      "barcode": "100087",
+      "image_url": "https://picsum.photos/seed/prod87/300/300"
+    },
+    {
+      "id": 88,
+      "category_id": 18,
+      "name": "Pet Treats 100g",
+      "price": 7950,
+      "stock_quantity": 83,
+      "low_stock_threshold": 7,
+      "barcode": "100088",
+      "image_url": "https://picsum.photos/seed/prod88/300/300"
+    },
+    {
+      "id": 89,
+      "category_id": 18,
+      "name": "Cat Litter 5L",
+      "price": 12100,
+      "stock_quantity": 112,
+      "low_stock_threshold": 3,
+      "barcode": "100089",
+      "image_url": "https://picsum.photos/seed/prod89/300/300"
+    },
+    {
+      "id": 90,
+      "category_id": 18,
+      "name": "Chew Toy",
+      "price": 8300,
+      "stock_quantity": 15,
+      "low_stock_threshold": 5,
+      "barcode": "100090",
+      "image_url": "https://picsum.photos/seed/prod90/300/300"
+    },
+    {
+      "id": 91,
+      "category_id": 19,
+      "name": "USB Cable 1m",
+      "price": 19800,
+      "stock_quantity": 24,
+      "low_stock_threshold": 6,
+      "barcode": "100091",
+      "image_url": "https://picsum.photos/seed/prod91/300/300"
+    },
+    {
+      "id": 92,
+      "category_id": 19,
+      "name": "Wall Charger 2A",
+      "price": 8600,
+      "stock_quantity": 72,
+      "low_stock_threshold": 7,
+      "barcode": "100092",
+      "image_url": "https://picsum.photos/seed/prod92/300/300"
+    },
+    {
+      "id": 93,
+      "category_id": 19,
+      "name": "Phone Case",
+      "price": 2400,
+      "stock_quantity": 105,
+      "low_stock_threshold": 14,
+      "barcode": "100093",
+      "image_url": "https://picsum.photos/seed/prod93/300/300"
+    },
+    {
+      "id": 94,
+      "category_id": 19,
+      "name": "Screen Protector",
+      "price": 11600,
+      "stock_quantity": 116,
+      "low_stock_threshold": 11,
+      "barcode": "100094",
+      "image_url": "https://picsum.photos/seed/prod94/300/300"
+    },
+    {
+      "id": 95,
+      "category_id": 19,
+      "name": "Earphones 3.5mm",
+      "price": 13650,
+      "stock_quantity": 108,
+      "low_stock_threshold": 14,
+      "barcode": "100095",
+      "image_url": "https://picsum.photos/seed/prod95/300/300"
+    },
+    {
+      "id": 96,
+      "category_id": 20,
+      "name": "Face Cream 50g",
+      "price": 14650,
+      "stock_quantity": 60,
+      "low_stock_threshold": 9,
+      "barcode": "100096",
+      "image_url": "https://picsum.photos/seed/prod96/300/300"
+    },
+    {
+      "id": 97,
+      "category_id": 20,
+      "name": "Lipstick",
+      "price": 12800,
+      "stock_quantity": 11,
+      "low_stock_threshold": 6,
+      "barcode": "100097",
+      "image_url": "https://picsum.photos/seed/prod97/300/300"
+    },
+    {
+      "id": 98,
+      "category_id": 20,
+      "name": "Compact Powder",
+      "price": 18050,
+      "stock_quantity": 105,
+      "low_stock_threshold": 14,
+      "barcode": "100098",
+      "image_url": "https://picsum.photos/seed/prod98/300/300"
+    },
+    {
+      "id": 99,
+      "category_id": 20,
+      "name": "Shower Gel 250ml",
+      "price": 3450,
+      "stock_quantity": 47,
+      "low_stock_threshold": 14,
+      "barcode": "100099",
+      "image_url": "https://picsum.photos/seed/prod99/300/300"
+    },
+    {
+      "id": 100,
+      "category_id": 20,
+      "name": "Moisturizer 100ml",
+      "price": 9000,
+      "stock_quantity": 12,
+      "low_stock_threshold": 4,
+      "barcode": "100100",
+      "image_url": "https://picsum.photos/seed/prod100/300/300"
+    }
+  ]
+}

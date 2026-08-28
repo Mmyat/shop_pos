@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import api from "../utils/api";
-import { Plus, Edit2, Trash2, Package, Search } from "lucide-react";
+import { useToast } from "../components/Toast";
+import { formatMMK } from "../utils/currency";
+import { Plus, Edit2, Trash2, Package, Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Product {
   id: number;
@@ -36,6 +38,7 @@ const emptyProductForm = {
 
 const Products = () => {
   const { t } = useTranslation();
+  const toast = useToast();
 
   // Role authentication state
   const [isAdmin, setIsAdmin] = useState(false);
@@ -44,7 +47,15 @@ const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
   const [loading, setLoading] = useState(true);
+
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   // Modal and form states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,10 +66,17 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await api.get("/products");
+      const params = new URLSearchParams();
+      params.set("page", String(page));
+      params.set("page_size", String(pageSize));
+      if (debouncedSearch.trim()) params.set("search", debouncedSearch.trim());
+      if (selectedCategory !== 'all') params.set("category_id", String(selectedCategory));
+      const res = await api.get(`/products?${params.toString()}`);
       const data = res.data as any;
       const items = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
       setProducts(items);
+      setTotal(Number(data?.total) || 0);
+      setTotalPages(Number(data?.total_pages) || 1);
     } catch (err) {
       console.error("Failed to fetch products:", err);
       setProducts([]);
@@ -124,9 +142,10 @@ const Products = () => {
       }
       setIsModalOpen(false);
       fetchProducts();
+      toast.success(editingProduct ? "Product updated." : "Product created.");
     } catch (err) {
       console.error(err);
-      alert("Failed to save product. Ensure the barcode is unique and all fields are complete.");
+      toast.error("Failed to save product. Ensure the barcode is unique and all fields are complete.");
     } finally {
       setIsSubmitting(false);
     }
@@ -137,9 +156,10 @@ const Products = () => {
     try {
       await api.delete(`/products/${id}`);
       fetchProducts();
+      toast.success("Product deleted.");
     } catch (err) {
       console.error(err);
-      alert("Failed to delete product.");
+      toast.error("Failed to delete product.");
     }
   };
 
@@ -149,12 +169,8 @@ const Products = () => {
     return "bg-green-100 text-green-700";
   };
 
-  const filteredProducts = (Array.isArray(products) ? products : []).filter(
-    (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.barcode.toLowerCase().includes(search.toLowerCase()) ||
-      (p.category?.name || "").toLowerCase().includes(search.toLowerCase()),
-  );
+  // Server already filters by search + category, so the displayed list is just the page.
+  const filteredProducts = products;
 
   useEffect(() => {
     // Extract logged in user credentials
@@ -168,9 +184,19 @@ const Products = () => {
       }
     }
 
-    fetchProducts();
     fetchCategories();
   }, []);
+
+  // Debounce the search input before it triggers a fetch
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // Refetch whenever page, search, or category filter changes
+  useEffect(() => {
+    fetchProducts();
+  }, [page, debouncedSearch, selectedCategory]);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 space-y-6">
@@ -201,16 +227,34 @@ const Products = () => {
         </div>
       </div>
 
-      {/* Search Input Filter */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-        <input
-          type="text"
-          placeholder="Search products by name, category, or barcode..."
-          className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-shadow text-sm"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      {/* Search + Category Filter */}
+      <div className="flex flex-col sm:flex-row gap-3 max-w-2xl">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search products by name, category, or barcode..."
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-shadow text-sm"
+            value={search}
+            onChange={(e) => {
+              setPage(1);
+              setSearch(e.target.value);
+            }}
+          />
+        </div>
+        <select
+          value={selectedCategory}
+          onChange={(e) => {
+            setPage(1);
+            setSelectedCategory(e.target.value === 'all' ? 'all' : Number(e.target.value));
+          }}
+          className="py-2 px-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-shadow text-sm bg-white"
+        >
+          <option value="all">All Categories</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
       </div>
 
       {/* Loading Spin */}
@@ -219,8 +263,9 @@ const Products = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-3 border-primary-200 border-t-primary-600"></div>
         </div>
       ) : (
-        /* Products Table Grid */
-        <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <>
+          /* Products Table Grid */
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
           <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
@@ -253,7 +298,7 @@ const Products = () => {
                     <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-md text-xs font-semibold">{product.category?.name || "Unassigned"}</span>
                   </td>
                   <td className="py-3 px-4 text-gray-500 text-sm font-mono">{product.barcode || "-"}</td>
-                  <td className="py-3 px-4 text-gray-800 text-sm font-semibold">${product.price.toFixed(2)}</td>
+                  <td className="py-3 px-4 text-gray-800 text-sm font-semibold">{formatMMK(product.price)}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStockBadge(product.stock_quantity, product.low_stock_threshold)}`}>
                       {product.stock_quantity}
@@ -292,6 +337,31 @@ const Products = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
+          <p className="text-xs text-gray-500">{t("total_results", { count: total })}</p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
+            >
+              <ChevronLeft size={16} /> {t("previous")}
+            </button>
+            <span className="text-sm text-gray-600 px-2">
+              {t("page_of", { page, total: totalPages })}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
+            >
+                {t("next")} <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* --- ADD / EDIT PRODUCT MODAL (ADMIN ONLY) --- */}

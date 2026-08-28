@@ -59,7 +59,7 @@ func Login(c *gin.Context) {
 	}
 
 	var user models.User
-	config.DB.First(&user, "username = ?", body.Username)
+	config.DB.Where("is_deleted = ?", false).First(&user, "username = ?", body.Username)
 
 	if user.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username or password"})

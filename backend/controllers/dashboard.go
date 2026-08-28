@@ -29,31 +29,32 @@ func GetDashboard(c *gin.Context) {
 	var stats DashboardStats
 
 	// Total sales count
-	config.DB.Model(&models.Sale{}).Count(&stats.TotalSales)
+	config.DB.Model(&models.Sale{}).Where("is_deleted = ?", false).Count(&stats.TotalSales)
 
 	// Total products count
-	config.DB.Model(&models.Product{}).Count(&stats.TotalProducts)
+	config.DB.Model(&models.Product{}).Where("is_deleted = ?", false).Count(&stats.TotalProducts)
 
 	// Total revenue (all time)
-	config.DB.Model(&models.Sale{}).Select("COALESCE(SUM(total_amount), 0)").Scan(&stats.TotalRevenue)
+	config.DB.Model(&models.Sale{}).Where("is_deleted = ?", false).Select("COALESCE(SUM(total_amount), 0)").Scan(&stats.TotalRevenue)
 
 	// Today's revenue
 	today := time.Now().Format("2006-01-02")
 	config.DB.Model(&models.Sale{}).
-		Where("DATE(created_at) = ?", today).
+		Where("is_deleted = ? AND DATE(created_at) = ?", false, today).
 		Select("COALESCE(SUM(total_amount), 0)").
 		Scan(&stats.TodayRevenue)
 
 	// Recent 5 sales
 	var recentSales []models.Sale
-	config.DB.Preload("User").Preload("Items").
+	config.DB.Preload("User").Preload("Items", "is_deleted = ?", false).Preload("Items.Product").
+		Where("is_deleted = ?", false).
 		Order("created_at DESC").Limit(5).
 		Find(&recentSales)
 
 	// Low stock products: stock <= threshold (COALESCE handles NULL or unset thresholds)
 	var lowStockProducts []models.Product
 	config.DB.Preload("Category").
-		Where("stock_quantity <= COALESCE(NULLIF(low_stock_threshold, 0), 5)").
+		Where("is_deleted = ? AND stock_quantity <= COALESCE(NULLIF(low_stock_threshold, 0), 5)", false).
 		Order("stock_quantity ASC").
 		Find(&lowStockProducts)
 

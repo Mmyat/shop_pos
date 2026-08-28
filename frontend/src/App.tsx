@@ -8,6 +8,7 @@ import Products from './pages/Products';
 import Categories from './pages/Categories';
 import Users from './pages/Users';
 import Sales from './pages/Sales';
+import Customers from './pages/Customers';
 import Login from './pages/Login';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -18,7 +19,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gray-100 dark:bg-slate-900 overflow-hidden">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -32,7 +33,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
       <div className="flex flex-col flex-1 w-full min-w-0">
         <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-3 sm:p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-slate-900 p-3 sm:p-6">
           {children}
         </main>
       </div>
@@ -79,6 +80,12 @@ function App() {
         <Route path="/sales" element={
           <ProtectedRoute>
             <Sales />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/customers" element={
+          <ProtectedRoute>
+            <Customers />
           </ProtectedRoute>
         } />
 

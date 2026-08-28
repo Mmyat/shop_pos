@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -52,6 +53,11 @@ func SeedDatabase() {
 	seedData(config.DB)
 }
 
+type seedFile struct {
+	Categories []models.Category `json:"categories"`
+	Products   []models.Product  `json:"products"`
+}
+
 func seedData(db *gorm.DB) {
 	// Seed Admin User
 	var count int64
@@ -67,35 +73,32 @@ func seedData(db *gorm.DB) {
 		fmt.Println("Created default admin user (admin / admin123)")
 	}
 
-	// Seed Categories and Products (Clear old ones first to refresh images)
-	db.Exec("TRUNCATE products, categories RESTART IDENTITY CASCADE")
-	fmt.Println("Refreshing products and categories with new image data...")
-
-	{
-		categories := []models.Category{
-			{Name: "Beverages", Description: "Drinks and juices"},
-			{Name: "Snacks", Description: "Chips, cookies, and quick bites"},
-			{Name: "Household", Description: "Cleaning supplies and daily use"},
-		}
-		db.Create(&categories)
-		fmt.Println("Created sample categories")
-
-		// Retrieve categories to get IDs
-		var catBev, catSnack, catHouse models.Category
-		db.Where("name = ?", "Beverages").First(&catBev)
-		db.Where("name = ?", "Snacks").First(&catSnack)
-		db.Where("name = ?", "Household").First(&catHouse)
-
-		// Seed Products
-		products := []models.Product{
-			{Name: "Coca Cola 1L", CategoryID: catBev.ID, Price: 1.50, StockQuantity: 50, LowStockThreshold: 10, Barcode: "000001", ImageURL: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?q=80&w=200&auto=format&fit=crop"},
-			{Name: "Orange Juice", CategoryID: catBev.ID, Price: 2.00, StockQuantity: 7, LowStockThreshold: 8, Barcode: "000002", ImageURL: "https://images.unsplash.com/photo-1613478223719-2ab802602423?q=80&w=200&auto=format&fit=crop"},
-			{Name: "Potato Chips", CategoryID: catSnack.ID, Price: 1.20, StockQuantity: 100, LowStockThreshold: 15, Barcode: "000003", ImageURL: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?q=80&w=200&auto=format&fit=crop"},
-			{Name: "Chocolate Chip Cookies", CategoryID: catSnack.ID, Price: 3.50, StockQuantity: 8, LowStockThreshold: 10, Barcode: "000004", ImageURL: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?q=80&w=200&auto=format&fit=crop"},
-			{Name: "Dishwashing Liquid", CategoryID: catHouse.ID, Price: 2.80, StockQuantity: 3, LowStockThreshold: 5, Barcode: "000005", ImageURL: "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?q=80&w=200&auto=format&fit=crop"},
-			{Name: "Laundry Detergent", CategoryID: catHouse.ID, Price: 5.50, StockQuantity: 0, LowStockThreshold: 3, Barcode: "000006", ImageURL: "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?q=80&w=200&auto=format&fit=crop"},
-		}
-		db.Create(&products)
-		fmt.Println("Created sample products")
+	// Load catalog demo data (20 categories / 100 products) from JSON reference
+	data, err := os.ReadFile("seed_data.json")
+	if err != nil {
+		fmt.Println("seed_data.json not found, skipping catalog seed:", err)
+		return
 	}
+
+	var seed seedFile
+	if err := json.Unmarshal(data, &seed); err != nil {
+		fmt.Println("Failed to parse seed_data.json:", err)
+		return
+	}
+
+	// Clear existing catalog before reseeding
+	db.Exec("TRUNCATE products, categories RESTART IDENTITY CASCADE")
+	fmt.Printf("Refreshing %d categories and %d products from seed_data.json...\n", len(seed.Categories), len(seed.Products))
+
+	if len(seed.Categories) > 0 {
+		if err := db.Create(&seed.Categories).Error; err != nil {
+			fmt.Println("Category seed error:", err)
+		}
+	}
+	if len(seed.Products) > 0 {
+		if err := db.Create(&seed.Products).Error; err != nil {
+			fmt.Println("Product seed error:", err)
+		}
+	}
+	fmt.Println("Catalog seed complete")
 }

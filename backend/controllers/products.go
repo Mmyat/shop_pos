@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"shop_pos_backend/cache"
@@ -11,6 +12,7 @@ import (
 	"shop_pos_backend/models"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 const productsCachePrefix = "products_page_"
@@ -38,30 +40,61 @@ func GetProducts(c *gin.Context) {
 		pageSize = 100
 	}
 
-	cacheKey := fmt.Sprintf("%s%d_size_%d", productsCachePrefix, page, pageSize)
+	search := strings.TrimSpace(c.Query("search"))
+	categoryID := parsePageParam(c.Query("category_id"), 0)
+
+	filtersSig := fmt.Sprintf("s_%s_c_%d", search, categoryID)
+	cacheKey := fmt.Sprintf("%s%d_size_%d_%s", productsCachePrefix, page, pageSize, filtersSig)
 	if cached, ok := cache.Default.Get(cacheKey); ok {
 		c.JSON(http.StatusOK, cached)
 		return
 	}
 
+	baseQuery := func(db *gorm.DB) *gorm.DB {
+		q := db.Model(&models.Product{}).Where("is_deleted = ?", false)
+		if search != "" {
+			q = q.Where("name ILIKE ? OR barcode ILIKE ?", "%"+search+"%", "%"+search+"%")
+		}
+		if categoryID > 0 {
+			q = q.Where("category_id = ?", categoryID)
+		}
+		return q
+	}
+
 	var total int64
-	config.DB.Model(&models.Product{}).Count(&total)
+	baseQuery(config.DB).Count(&total)
 
 	var products []models.Product
-	if result := config.DB.Preload("Category").Limit(pageSize).Offset((page - 1) * pageSize).Find(&products); result.Error != nil {
+	if result := baseQuery(config.DB).Preload("Category").Limit(pageSize).Offset((page - 1) * pageSize).Find(&products); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve products"})
 		return
 	}
 
+	totalPages := 0
+	if pageSize > 0 {
+		totalPages = int((total + int64(pageSize) - 1) / int64(pageSize))
+	}
+
 	response := gin.H{
-		"items":     products,
-		"page":      page,
-		"page_size": pageSize,
-		"total":     total,
+		"items":       products,
+		"page":        page,
+		"page_size":   pageSize,
+		"total":       total,
+		"total_pages": totalPages,
 	}
 
 	cache.Default.Set(cacheKey, response, 2*time.Minute)
 	c.JSON(http.StatusOK, response)
+}
+
+func GetProductByBarcode(c *gin.Context) {
+	barcode := strings.TrimSpace(c.Param("barcode"))
+	var product models.Product
+	if result := config.DB.Preload("Category").Where("is_deleted = ? AND barcode = ?", false, barcode).First(&product); result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		return
+	}
+	c.JSON(http.StatusOK, product)
 }
 
 func parsePageParam(value string, fallback int) int {
@@ -78,7 +111,7 @@ func parsePageParam(value string, fallback int) int {
 func UpdateProduct(c *gin.Context) {
 	id := c.Param("id")
 	var product models.Product
-	if result := config.DB.First(&product, id); result.Error != nil {
+	if result := config.DB.Where("is_deleted = ?", false).First(&product, id); result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}
@@ -95,7 +128,7 @@ func UpdateProduct(c *gin.Context) {
 
 func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
-	if result := config.DB.Delete(&models.Product{}, id); result.Error != nil {
+	if result := config.DB.Model(&models.Product{}).Where("id = ?", id).Update("is_deleted", true); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
 		return
 	}
@@ -116,7 +149,7 @@ func UpdateStock(c *gin.Context) {
 	}
 
 	var product models.Product
-	if result := config.DB.First(&product, id); result.Error != nil {
+	if result := config.DB.Where("is_deleted = ?", false).First(&product, id); result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}

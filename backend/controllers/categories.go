@@ -36,7 +36,7 @@ func GetCategories(c *gin.Context) {
 	}
 
 	var categories []models.Category
-	if result := config.DB.Find(&categories); result.Error != nil {
+	if result := config.DB.Where("is_deleted = ?", false).Find(&categories); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve categories"})
 		return
 	}
@@ -48,7 +48,7 @@ func GetCategories(c *gin.Context) {
 func UpdateCategory(c *gin.Context) {
 	id := c.Param("id")
 	var category models.Category
-	if result := config.DB.First(&category, id); result.Error != nil {
+	if result := config.DB.Where("is_deleted = ?", false).First(&category, id); result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Category not found"})
 		return
 	}
@@ -65,7 +65,7 @@ func UpdateCategory(c *gin.Context) {
 
 func DeleteCategory(c *gin.Context) {
 	id := c.Param("id")
-	if result := config.DB.Delete(&models.Category{}, id); result.Error != nil {
+	if result := config.DB.Model(&models.Category{}).Where("id = ?", id).Update("is_deleted", true); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete category"})
 		return
 	}
