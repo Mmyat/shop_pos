@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"os"
+	// "os"
 
 	"shop_pos_backend/config"
 	"shop_pos_backend/models"
@@ -26,10 +26,10 @@ func main() {
 	// Migrate Models
 	config.DB.AutoMigrate(&models.User{}, &models.Category{}, &models.Product{}, &models.Sale{}, &models.SaleItem{}, &models.Customer{})
 
-	// Seed demo data when explicitly enabled (truncates & reloads catalog)
-	if os.Getenv("SEED") == "true" {
-		SeedDatabase()
-	}
+	// // Seed demo data when explicitly enabled (truncates & reloads catalog)
+	// if os.Getenv("SEED") == "true" {
+	// 	SeedDatabase()
+	// }
 
 	// Create a default admin user if none exists
 	var admin models.User

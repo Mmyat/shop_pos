@@ -4,6 +4,7 @@ import api from "../utils/api";
 import { useToast } from "../components/Toast";
 import { formatMMK } from "../utils/currency";
 import { Plus, Edit2, Trash2, Package, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import CustomSelect from "../components/CustomSelect";
 
 interface Product {
   id: number;
@@ -242,19 +243,17 @@ const Products = () => {
             }}
           />
         </div>
-        <select
-          value={selectedCategory}
-          onChange={(e) => {
-            setPage(1);
-            setSelectedCategory(e.target.value === 'all' ? 'all' : Number(e.target.value));
-          }}
-          className="py-2 px-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none transition-shadow text-sm bg-white"
-        >
-          <option value="all">All Categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
+        <div className="w-full sm:w-52 shrink-0">
+          <CustomSelect
+            value={selectedCategory}
+            onChange={(v) => {
+              setPage(1);
+              setSelectedCategory(v === 'all' ? 'all' : Number(v));
+            }}
+            options={[{ value: 'all', label: t('all_categories') || 'All Categories' }, ...categories.map((c) => ({ value: c.id, label: c.name }))]}
+            placeholder="All Categories"
+          />
+        </div>
       </div>
 
       {/* Loading Spin */}
@@ -264,7 +263,7 @@ const Products = () => {
         </div>
       ) : (
         <>
-          /* Products Table Grid */
+          {/* Products Table Grid */}
           <div className="overflow-x-auto -mx-4 sm:mx-0">
           <table className="w-full text-left border-collapse min-w-[700px]">
             <thead>
@@ -460,22 +459,14 @@ const Products = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                  <select
-                    className="input-field bg-white"
-                    required
+                  <CustomSelect
                     value={formData.category_id}
-                    onChange={(e) => setFormData({ ...formData, category_id: Number(e.target.value) })}
-                  >
-                    {categories.length === 0 ? (
-                      <option value={0}>No Categories Available</option>
-                    ) : (
-                      categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </option>
-                      ))
-                    )}
-                  </select>
+                    onChange={(v) => setFormData({ ...formData, category_id: Number(v) })}
+                    options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
+                    placeholder={categories.length === 0 ? "No Categories Available" : "Select category"}
+                    required
+                    disabled={categories.length === 0}
+                  />
                 </div>
               </div>
 
